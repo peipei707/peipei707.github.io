@@ -1,0 +1,1619 @@
+<meta charset="utf-8" />
+<title>颜文字小铺 · 点一下就复制</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<style>
+  :root {
+    --bg:        #FBF5F3;
+    --card:      #FFFFFF;
+    --edge:      #EEDCD8;
+    --ink:       #3A2C31;
+    --ink-soft:  #8B747B;
+    --rose:      #C9587A;
+    --rose-wash: #FAE4EA;
+    --on-rose:   #FFFFFF;
+    --peri:      #6169B4;
+    --shadow:    0 1px 0 rgba(58,44,49,.03), 0 10px 24px -18px rgba(58,44,49,.55);
+    --r:         14px;
+    --serif:     "Songti SC", "STSong", "Noto Serif SC", Georgia, "Times New Roman", serif;
+    --sans:      -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+    --kao:       "Apple Color Emoji", "Segoe UI Symbol", "Segoe UI Emoji",
+                 "Noto Sans Symbols 2", "Noto Sans Symbols", "Noto Sans Math",
+                 "Arial Unicode MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#1B161A; --card:#262029; --edge:#3B3040;
+      --ink:#F1E6EA; --ink-soft:#A6939C; --rose:#F0899F; --rose-wash:#3A2530;
+      --on-rose:#241D23; --peri:#A5A9E8;
+      --shadow: 0 1px 0 rgba(0,0,0,.2), 0 10px 24px -18px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#1B161A; --card:#262029; --edge:#3B3040;
+    --ink:#F1E6EA; --ink-soft:#A6939C; --rose:#F0899F; --rose-wash:#3A2530;
+    --on-rose:#241D23; --peri:#A5A9E8;
+    --shadow: 0 1px 0 rgba(0,0,0,.2), 0 10px 24px -18px rgba(0,0,0,.9);
+  }
+  :root[data-theme="light"] {
+    --bg:#FBF5F3; --card:#FFFFFF; --edge:#EEDCD8;
+    --ink:#3A2C31; --ink-soft:#8B747B; --rose:#C9587A; --rose-wash:#FAE4EA;
+    --on-rose:#FFFFFF; --peri:#6169B4;
+    --shadow: 0 1px 0 rgba(58,44,49,.03), 0 10px 24px -18px rgba(58,44,49,.55);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 18px 96px; }
+
+  /* ---------- 顶部 ---------- */
+  header.hero {
+    padding: 44px 0 22px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .kicker {
+    font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(30px, 6vw, 44px);
+    font-weight: 600; letter-spacing: .02em; margin: 0;
+    text-wrap: balance;
+  }
+  h1 .deco { color: var(--rose); font-family: var(--kao); }
+  .sub { margin: 0; color: var(--ink-soft); max-width: 58ch; font-size: 15px; }
+
+  /* ---------- 脚本跑不起来时的说明 ----------
+     一切默认可见，脚本能跑时才把这些收起来。有些手机上的文件预览器会把
+     脚本标签连同 noscript 一起删掉，所以不能反过来做成「等脚本来显示」。 */
+  .nojs {
+    margin: 16px 0 0; padding: 12px 16px;
+    background: var(--rose-wash); border: 1px solid var(--rose);
+    border-radius: var(--r); font-size: 14px; color: var(--ink);
+  }
+  .nojs b { font-weight: 600; }
+  .js .nojs { display: none; }
+  .searchrow { display: none; }
+  .js .searchrow { display: flex; }
+
+  /* ---------- 搜索 + 分类 ---------- */
+  .sticky {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--edge);
+    margin: 0 -18px; padding: 10px 18px 0;
+  }
+  .searchrow { gap: 8px; align-items: center; }
+  input[type="search"] {
+    flex: 1; min-width: 0;
+    font: inherit; font-size: 15px; color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--edge); border-radius: 999px;
+    padding: 10px 16px;
+    appearance: none;
+  }
+  input[type="search"]::placeholder { color: var(--ink-soft); }
+  input[type="search"]:focus-visible,
+  button:focus-visible, .tile:focus-visible {
+    outline: 2px solid var(--peri); outline-offset: 2px;
+  }
+  .iconbtn {
+    flex: none; width: 40px; height: 40px; border-radius: 999px;
+    background: var(--card); border: 1px solid var(--edge);
+    color: var(--ink); font-size: 15px; cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .chips {
+    display: flex; gap: 6px; overflow-x: auto; padding: 10px 0;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; cursor: pointer;
+    font: inherit; font-size: 13.5px;
+    padding: 6px 13px; border-radius: 999px;
+    border: 1px solid var(--edge); background: var(--card); color: var(--ink-soft);
+    white-space: nowrap; text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  /* 需要脚本才有意义的分类（收藏、常用），脚本没跑就不显示 */
+  .chip.needs-js { display: none; }
+  .js .chip.needs-js { display: inline-flex; }
+  .chip[aria-pressed="true"] {
+    background: var(--rose); border-color: var(--rose);
+    color: var(--on-rose); font-weight: 600;
+  }
+
+  /* ---------- 分区 ---------- */
+  /* 跳转时留出顶栏的高度，别让标题被盖住 */
+  section { margin-top: 34px; scroll-margin-top: 72px; }
+  .js section { scroll-margin-top: 124px; }
+  .sechead {
+    display: flex; align-items: baseline; gap: 10px;
+    padding-bottom: 10px;
+  }
+  h2 {
+    font-family: var(--serif); font-size: 19px; font-weight: 600;
+    margin: 0; letter-spacing: .04em;
+  }
+  .count {
+    font-size: 12px; color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .rule { flex: 1; height: 1px; background: var(--edge); }
+
+  .grid {
+    display: grid; gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .grid.parts { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); }
+
+  .tile {
+    position: relative;
+    font-family: var(--kao); font-size: 16px; line-height: 1.35;
+    color: var(--ink);
+    background: var(--card); border: 1px solid var(--edge);
+    border-radius: var(--r); box-shadow: var(--shadow);
+    padding: 16px 10px; min-height: 62px;
+    display: grid; place-items: center; text-align: center;
+    word-break: break-word;
+    -webkit-user-select: text; user-select: text;
+    transition: transform .12s ease, border-color .12s ease, background .12s ease;
+  }
+  .grid.parts .tile { font-size: 19px; padding: 12px 6px; min-height: 48px; }
+  .js .tile { cursor: pointer; }
+  .js .tile:hover { transform: translateY(-2px); border-color: var(--rose); }
+  .js .tile:active { transform: translateY(0) scale(.97); }
+  .tile.copied { background: var(--rose-wash); border-color: var(--rose); }
+  .fav {
+    position: absolute; top: 3px; right: 5px;
+    font-size: 12px; color: var(--edge); font-family: var(--kao);
+    padding: 3px; line-height: 1; background: none; border: 0; cursor: pointer;
+    opacity: 0; transition: opacity .12s ease;
+    display: none;
+  }
+  .js .fav { display: block; }
+  .tile:hover .fav, .fav[aria-pressed="true"] { opacity: 1; }
+  .fav[aria-pressed="true"] { color: var(--rose); }
+  @media (hover: none) { .js .fav { opacity: .55; } }
+
+  /* ---------- 目录按钮 + 全屏目录 ----------
+     用 :target 开合，没有脚本也能用。 */
+  .fab {
+    position: fixed; z-index: 40;
+    right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 11px 18px; border-radius: 999px;
+    background: var(--rose); color: var(--on-rose);
+    font-size: 14px; font-weight: 600; letter-spacing: .06em;
+    text-decoration: none;
+    box-shadow: 0 6px 20px -6px rgba(0,0,0,.45);
+  }
+  .fab:active { transform: scale(.96); }
+
+  .menu { display: none; }
+  .menu:target {
+    display: block;
+    position: fixed; inset: 0; z-index: 60;
+    background: var(--bg);
+    overflow-y: auto;
+    padding: 22px 18px calc(28px + env(safe-area-inset-bottom));
+  }
+  .menu-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding-bottom: 14px;
+  }
+  .menu-head h2 { font-size: 22px; }
+  .menu-close {
+    font-size: 14px; color: var(--ink-soft); text-decoration: none;
+    border: 1px solid var(--edge); border-radius: 999px; padding: 6px 14px;
+  }
+  .menu-grid {
+    display: grid; gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  }
+  .menu-grid a {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    padding: 13px 15px; border-radius: var(--r);
+    background: var(--card); border: 1px solid var(--edge);
+    color: var(--ink); text-decoration: none; font-size: 15px;
+  }
+  .menu-grid a:active { border-color: var(--rose); }
+  .menu-grid .n {
+    font-size: 12px; color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hidden { display: none !important; }
+  .empty { color: var(--ink-soft); font-size: 14px; padding: 30px 0; }
+
+  /* ---------- 提示 ---------- */
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px);
+    background: var(--ink); color: var(--bg);
+    padding: 10px 20px; border-radius: 999px;
+    font-size: 14px; font-weight: 600; letter-spacing: .04em;
+    opacity: 0; pointer-events: none; z-index: 50;
+    transition: opacity .18s ease, transform .18s ease;
+    max-width: 88vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  footer {
+    margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--edge);
+    color: var(--ink-soft); font-size: 13px;
+  }
+  footer p { margin: 6px 0; }
+  footer .mono { font-family: var(--kao); color: var(--rose); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">Kaomoji &amp; 可爱符号库 · 741 个</div>
+    <h1>颜文字小铺 <span class="deco">૮₍ ˶•⤙•˶ ₎ა</span></h1>
+    <p class="sub">点一下就复制，直接粘到聊天框里。收藏用右上角的 ♡，复制过的会记在「常用」栏。</p>
+    <p class="nojs">
+      <b>现在是预览模式</b>，这个打开方式关掉了网页脚本，所以点击复制和搜索用不了。
+      表情全都在下面，点分类可以跳过去，<b>长按选中就能复制</b>。想要点一下就复制的话，
+      把文件存到「文件」App，再用 Safari 打开。
+    </p>
+  </header>
+
+  <div class="sticky" id="controls">
+    <div class="searchrow">
+      <input type="search" id="q" placeholder="搜一下：开心 / 哭 / 猫 / 星星 / 抱抱…" autocomplete="off" />
+      <button class="iconbtn" id="theme" title="切换深浅色" aria-label="切换深浅色">☾</button>
+    </div>
+    <nav class="chips" id="chips" aria-label="分类">
+      <a class="chip" href="#cat-0">开心</a>
+      <a class="chip" href="#cat-1">害羞</a>
+      <a class="chip" href="#cat-2">爱心撒娇</a>
+      <a class="chip" href="#cat-3">卖萌求求</a>
+      <a class="chip" href="#cat-4">难过哭泣</a>
+      <a class="chip" href="#cat-5">生气</a>
+      <a class="chip" href="#cat-6">疑惑</a>
+      <a class="chip" href="#cat-7">惊讶</a>
+      <a class="chip" href="#cat-8">无语冷漠</a>
+      <a class="chip" href="#cat-9">困了睡了</a>
+      <a class="chip" href="#cat-10">小动物</a>
+      <a class="chip" href="#cat-11">打招呼</a>
+      <a class="chip" href="#cat-12">庆祝跳舞</a>
+      <a class="chip" href="#cat-13">动作手势</a>
+      <a class="chip" href="#cat-14">期待兴奋</a>
+      <a class="chip" href="#cat-15">吃东西</a>
+      <a class="chip" href="#cat-16">累了打工</a>
+      <a class="chip" href="#cat-17">加油鼓励</a>
+      <a class="chip" href="#cat-18">谢谢道歉</a>
+      <a class="chip" href="#cat-19">尴尬心虚</a>
+      <a class="chip" href="#cat-20">得意骄傲</a>
+      <a class="chip" href="#cat-21">偷看躲藏</a>
+      <a class="chip" href="#cat-22">魔法撒花</a>
+      <a class="chip" href="#cat-23">音乐</a>
+      <a class="chip" href="#cat-24">沙雕恶搞</a>
+      <a class="chip" href="#cat-25">韩系颜文字</a>
+      <a class="chip" href="#cat-26">抱抱安慰</a>
+      <a class="chip" href="#cat-27">脸的零件</a>
+      <a class="chip" href="#cat-28">装饰符号</a>
+      <a class="chip" href="#cat-29">边框分隔</a>
+    </nav>
+  </div>
+
+  <main id="out">
+    <section id="cat-0" data-c="开心">
+      <div class="sechead">
+        <h2>开心</h2>
+        <div class="rule"></div>
+        <span class="count">51 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(◕‿◕)" data-k="开心 微笑 happy 开心"><span>(◕‿◕)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＾▽＾)" data-k="开心 笑 happy 开心"><span>(＾▽＾)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´∀｀)" data-k="开心 笑 happy 开心"><span>(´∀｀)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*^▽^*)" data-k="开心 兴奋 happy 开心"><span>(*^▽^*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(´▽`)/" data-k="开心 举手 happy 开心"><span>ヽ(´▽`)/</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(≧▽≦)" data-k="大笑 兴奋 happy 开心"><span>(≧▽≦)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*≧ω≦*)" data-k="开心 激动 happy 开心"><span>(*≧ω≦*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(◕‿◕)۶" data-k="开心 加油 happy 开心"><span>٩(◕‿◕)۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＾ω＾)" data-k="开心 微笑 happy 开心"><span>(＾ω＾)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´｡• ᵕ •｡`)" data-k="开心 软 happy cute 开心"><span>(´｡• ᵕ •｡`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˃ᴗ˂)ﻭ" data-k="开心 加油 happy 开心"><span>(๑˃ᴗ˂)ﻭ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="\(≧▽≦)/" data-k="欢呼 开心 happy 开心"><span>\(≧▽≦)/</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◍•ᴗ•◍)" data-k="开心 软 happy 开心"><span>(◍•ᴗ•◍)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*'▽'*)" data-k="开心 happy 开心"><span>(*'▽'*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮ ˶ᵔ ᵕ ᵔ˶ ა" data-k="开心 可爱 cute 开心"><span>૮ ˶ᵔ ᵕ ᵔ˶ ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⁀ᗢ⁀)" data-k="开心 咧嘴 happy 开心"><span>(⁀ᗢ⁀)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*´꒳`*)" data-k="开心 软 happy 开心"><span>(*´꒳`*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＊¯︶¯＊)" data-k="满足 开心 happy 开心"><span>(＊¯︶¯＊)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(ˊᗜˋ*)و" data-k="开心 加油 happy 开心"><span>٩(ˊᗜˋ*)و</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(•̀ᴗ•́)و" data-k="有干劲 加油 happy 开心"><span>(•̀ᴗ•́)و</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(o＾▽＾o)ノ" data-k="欢呼 开心 happy 开心"><span>ヽ(o＾▽＾o)ノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◠‿◠)" data-k="微笑 happy 开心"><span>(◠‿◠)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´｡•ᵕ•｡`)♡" data-k="开心 爱心 happy love 开心"><span>(´｡•ᵕ•｡`)♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*≧∀≦*)" data-k="开心 大笑 happy 开心"><span>(*≧∀≦*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣▽￣)" data-k="笑 happy 开心"><span>(￣▽￣)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(o´∀`o)" data-k="开心 happy 开心"><span>(o´∀`o)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˙꒳˙ )" data-k="平静 呆 happy 开心"><span>( ˙꒳˙ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＾◡＾)" data-k="微笑 happy 开心"><span>(＾◡＾)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(●'◡'●)" data-k="开心 脸红 happy 开心"><span>(●'◡'●)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(｡•ω•｡)و" data-k="开心 加油 happy 开心"><span>٩(｡•ω•｡)و</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´꒳`)" data-k="开心 呆萌 happy 开心"><span>(´꒳`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˘︶˘๑)" data-k="满足 开心 happy 开心"><span>(๑˘︶˘๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◕ᴗ◕✿)" data-k="开心 花 happy 开心"><span>(◕ᴗ◕✿)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ᵕ̈*)" data-k="开心 软 happy 开心"><span>(*ᵕ̈*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⑅˘꒳˘)" data-k="满足 happy 开心"><span>(⑅˘꒳˘)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(♡ε♡ )۶" data-k="开心 陶醉 happy 开心"><span>٩(♡ε♡ )۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*'ω'*)" data-k="开心 happy 开心"><span>(*'ω'*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´▽`ʃ♡ƪ)" data-k="开心 爱 happy 开心"><span>(´▽`ʃ♡ƪ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑´ㅂ`๑)" data-k="开心 happy 开心"><span>(๑´ㅂ`๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ᐛ )" data-k="咧嘴 憨 happy 开心"><span>( ᐛ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◜ᴗ◝ )" data-k="微笑 happy 开心"><span>(◜ᴗ◝ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="o(≧▽≦)o" data-k="大笑 happy 开心"><span>o(≧▽≦)o</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾉ´ヮ`)ﾉ*: ･ﾟ" data-k="开心 撒花 happy 开心"><span>(ﾉ´ヮ`)ﾉ*: ･ﾟ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*´∀｀*)" data-k="开心 happy 开心"><span>(*´∀｀*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⌒ω⌒)" data-k="微笑 happy 开心"><span>(⌒ω⌒)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(๑&gt;◡&lt;๑)۶" data-k="开心 加油 happy 开心"><span>٩(๑&gt;◡&lt;๑)۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*≧▽≦)ﾉ" data-k="开心 招手 happy 开心"><span>(*≧▽≦)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◦˘ ᵕ ˘◦)" data-k="满足 happy 开心"><span>(◦˘ ᵕ ˘◦)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑ᵔ⤙ᵔ๑)" data-k="开心 happy 开心"><span>(๑ᵔ⤙ᵔ๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˶ˆᗜˆ˵ )" data-k="开心 咧嘴 happy 开心"><span>( ˶ˆᗜˆ˵ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑&gt;◡&lt;๑)" data-k="开心 happy 开心"><span>(๑&gt;◡&lt;๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-1" data-c="害羞">
+      <div class="sechead">
+        <h2>害羞</h2>
+        <div class="rule"></div>
+        <span class="count">24 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(⁄ ⁄•⁄ω⁄•⁄ ⁄)" data-k="害羞 脸红 shy 害羞"><span>(⁄ ⁄•⁄ω⁄•⁄ ⁄)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*/ω＼*)" data-k="害羞 捂脸 shy 害羞"><span>(*/ω＼*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(//∇//)" data-k="害羞 脸红 shy 害羞"><span>(//∇//)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⁄ ⁄&gt;⁄ ▽ ⁄&lt;⁄ ⁄)" data-k="害羞 脸红 shy 害羞"><span>(⁄ ⁄&gt;⁄ ▽ ⁄&lt;⁄ ⁄)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ﾉ▽ﾉ)" data-k="害羞 shy 害羞"><span>(*ﾉ▽ﾉ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(〃∀〃)" data-k="害羞 脸红 shy 害羞"><span>(〃∀〃)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˃̵ᴗ˂̵)" data-k="害羞 开心 shy 害羞"><span>(๑˃̵ᴗ˂̵)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(〃ω〃)" data-k="害羞 shy 害羞"><span>(〃ω〃)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(„ಡωಡ„)" data-k="害羞 软 shy 害羞"><span>(„ಡωಡ„)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⁄˘⁄ ⁄ ⁄ω⁄ ⁄ ⁄˘⁄)" data-k="害羞 脸红 shy 害羞"><span>(⁄˘⁄ ⁄ ⁄ω⁄ ⁄ ⁄˘⁄)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ⁄ ⁄•⁄ω⁄•⁄ ⁄ʔ" data-k="害羞 熊 shy bear 害羞"><span>ʕ⁄ ⁄•⁄ω⁄•⁄ ⁄ʔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ﾉωﾉ)" data-k="害羞 shy 害羞"><span>(*ﾉωﾉ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(///ω///)♡" data-k="害羞 爱心 shy love 害羞"><span>(///ω///)♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑&gt;؂&lt;๑)" data-k="害羞 扭捏 shy 害羞"><span>(๑&gt;؂&lt;๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⁄ ⁄´⁄ω⁄`⁄ ⁄)" data-k="害羞 脸红 shy 害羞"><span>(⁄ ⁄´⁄ω⁄`⁄ ⁄)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⁄˃⁄ ▽ ⁄˂⁄)" data-k="害羞 shy 害羞"><span>(⁄˃⁄ ▽ ⁄˂⁄)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑´ㅁ`๑)" data-k="害羞 慌 shy 害羞"><span>(๑´ㅁ`๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ﾉдﾉ)" data-k="害羞 捂脸 shy 害羞"><span>(*ﾉдﾉ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˃̶᷇⌓˂̶᷆๑)" data-k="害羞 委屈 shy 害羞"><span>(๑˃̶᷇⌓˂̶᷆๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⑅///ω///⑅)" data-k="害羞 脸红 shy 害羞"><span>(⑅///ω///⑅)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(°◡°♡)" data-k="害羞 喜欢 shy 害羞"><span>(°◡°♡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑′ᴗ‵๑)" data-k="害羞 开心 shy 害羞"><span>(๑′ᴗ‵๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⸝⸝⸝๑ᴗ๑⸝⸝⸝)" data-k="害羞 软 shy 害羞"><span>(⸝⸝⸝๑ᴗ๑⸝⸝⸝)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑ᵕ⌓ᵕ̤)" data-k="害羞 心虚 shy 害羞"><span>(๑ᵕ⌓ᵕ̤)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-2" data-c="爱心撒娇">
+      <div class="sechead">
+        <h2>爱心撒娇</h2>
+        <div class="rule"></div>
+        <span class="count">38 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(´♡‿♡`)" data-k="爱 心动 love 爱心撒娇"><span>(´♡‿♡`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(♡˙︶˙♡)" data-k="爱 喜欢 love 爱心撒娇"><span>(♡˙︶˙♡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(｡♥‿♥｡)" data-k="爱 心动 love 爱心撒娇"><span>(｡♥‿♥｡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡(˃͈ દ ˂͈ ༶ )" data-k="撒娇 亲 love 爱心撒娇"><span>♡(˃͈ દ ˂͈ ༶ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑°꒵°๑)・*♡" data-k="撒娇 love 爱心撒娇"><span>(๑°꒵°๑)・*♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ˘з(˘⌣˘ )" data-k="亲亲 kiss love 爱心撒娇"><span>(っ˘з(˘⌣˘ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡( ◡‿◡ )" data-k="喜欢 love 爱心撒娇"><span>♡( ◡‿◡ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*˘︶˘*).｡.:*♡" data-k="满足 喜欢 love 爱心撒娇"><span>(*˘︶˘*).｡.:*♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(♡μ_μ)" data-k="感动 love 爱心撒娇"><span>(♡μ_μ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ღ(¯`◕‿◕´¯)" data-k="爱 love 爱心撒娇"><span>ღ(¯`◕‿◕´¯)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◍•ᴗ•◍)❤" data-k="喜欢 love 爱心撒娇"><span>(◍•ᴗ•◍)❤</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡＾▽＾♡" data-k="开心 爱 love 爱心撒娇"><span>♡＾▽＾♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´｡• ω •｡`) ♡" data-k="软 撒娇 love 爱心撒娇"><span>(´｡• ω •｡`) ♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(≧◡≦) ♡" data-k="喜欢 love 爱心撒娇"><span>(≧◡≦) ♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´,,•ω•,,)♡" data-k="撒娇 软 love 爱心撒娇"><span>(´,,•ω•,,)♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ა♡" data-k="可爱 撒娇 love 爱心撒娇"><span>૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ა♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(づ￣ ³￣)づ" data-k="亲 抱 kiss 爱心撒娇"><span>(づ￣ ³￣)づ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´ε｀ )♡" data-k="亲亲 kiss love 爱心撒娇"><span>(´ε｀ )♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(♡ω♡)" data-k="心动 love 爱心撒娇"><span>(♡ω♡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*♡∀♡)" data-k="心动 love 爱心撒娇"><span>(*♡∀♡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡´･ᴗ･`♡" data-k="喜欢 love 爱心撒娇"><span>♡´･ᴗ･`♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˘︶˘๑)♡" data-k="满足 love 爱心撒娇"><span>(๑˘︶˘๑)♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˘⌣˘)♡" data-k="喜欢 love 爱心撒娇"><span>(๑˘⌣˘)♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡(๑˃̵ᴗ˂̵)" data-k="喜欢 开心 love 爱心撒娇"><span>♡(๑˃̵ᴗ˂̵)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ˘♡˘ς)" data-k="抱 喜欢 love 爱心撒娇"><span>(っ˘♡˘ς)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(≧♡≦)" data-k="喜欢 love 爱心撒娇"><span>(≧♡≦)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡(&gt;ᴗ•)" data-k="眨眼 喜欢 love 爱心撒娇"><span>♡(&gt;ᴗ•)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮ ˃ᴗ˂ ა♡" data-k="撒娇 love 爱心撒娇"><span>૮ ˃ᴗ˂ ა♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´♡ω♡`)" data-k="心动 love 爱心撒娇"><span>(´♡ω♡`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(❁´◡`❁)" data-k="喜欢 花 love 爱心撒娇"><span>(❁´◡`❁)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡( ˃᷄ᵕ˂᷅ )" data-k="喜欢 love 爱心撒娇"><span>♡( ˃᷄ᵕ˂᷅ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⑅˘͈ ᵕ ˘͈)♡" data-k="满足 love 爱心撒娇"><span>(⑅˘͈ ᵕ ˘͈)♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*˘︶˘*)♡" data-k="喜欢 love 爱心撒娇"><span>(*˘︶˘*)♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´ ˘ ω ˘ `)♡" data-k="撒娇 love 爱心撒娇"><span>(´ ˘ ω ˘ `)♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍ ˃ ⤙ ˂ ₎ა" data-k="撒娇 抱 love 爱心撒娇 小动物 撒娇 cute 小动物"><span>૮₍ ˃ ⤙ ˂ ₎ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(♡ﾉ・ω・)ﾉ" data-k="送爱心 love 爱心撒娇"><span>(♡ﾉ・ω・)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡＋(●´∀`●)＋♡" data-k="喜欢 love 爱心撒娇"><span>♡＋(●´∀`●)＋♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(≧ᗜ≦)♡" data-k="开心 喜欢 love 爱心撒娇"><span>(≧ᗜ≦)♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-3" data-c="卖萌求求">
+      <div class="sechead">
+        <h2>卖萌求求</h2>
+        <div class="rule"></div>
+        <span class="count">26 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(´•ω•̥`)" data-k="求求 委屈 plz 卖萌求求"><span>(´•ω•̥`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ᴗ˳ᴗ)" data-k="求求 乖 plz 卖萌求求"><span>(ᴗ˳ᴗ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ- ‸ - ς)" data-k="委屈 撇嘴 plz 卖萌求求"><span>(っ- ‸ - ς)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(灬º‿º灬)" data-k="卖萌 cute 卖萌求求"><span>(灬º‿º灬)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑•́ ₃ •̀๑)" data-k="撅嘴 撒娇 plz 卖萌求求"><span>(๑•́ ₃ •̀๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＞人＜;)" data-k="拜托 求 plz 卖萌求求"><span>(＞人＜;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(人･㉨･)" data-k="拜托 熊 plz 卖萌求求"><span>(人･㉨･)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ｡ •̀ ᴖ •́ ｡)" data-k="求求 认真 plz 卖萌求求"><span>( ｡ •̀ ᴖ •́ ｡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´｡•̥̥̥ ᵕ •̥̥̥｡`)" data-k="可怜 求 plz 卖萌求求"><span>(´｡•̥̥̥ ᵕ •̥̥̥｡`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◞‸◟)" data-k="失落 委屈 plz 卖萌求求"><span>(◞‸◟)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑•́ ‧̫ •̀๑)" data-k="委屈 卖萌 plz 卖萌求求"><span>(๑•́ ‧̫ •̀๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˘•ω•˘ )" data-k="委屈 plz 卖萌求求"><span>( ˘•ω•˘ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣﹃￣)" data-k="馋 想要 plz 卖萌求求"><span>(￣﹃￣)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍ ´• ˕ •` ₎ა" data-k="卖萌 求 plz cute 卖萌求求"><span>૮₍ ´• ˕ •` ₎ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⁄ ⁄•⁄-⁄•⁄ ⁄)" data-k="小声 求 plz 卖萌求求"><span>(⁄ ⁄•⁄-⁄•⁄ ⁄)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑ᵕ⌓ᵕ̤)ᐝ" data-k="委屈 求 plz 卖萌求求"><span>(๑ᵕ⌓ᵕ̤)ᐝ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍ ˃̵͈̑ᴗ˂̵͈̑ ₎ა" data-k="卖萌 cute 卖萌求求"><span>૮₍ ˃̵͈̑ᴗ˂̵͈̑ ₎ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ᵕ̩̩ㅅᵕ̩̩ )" data-k="可怜 兔 plz 卖萌求求"><span>( ᵕ̩̩ㅅᵕ̩̩ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´•ᴗ• ก )" data-k="心虚 求 plz 卖萌求求"><span>(´•ᴗ• ก )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑ˊ•̥▵•)੭₎₎" data-k="委屈 撒娇 plz 卖萌求求"><span>(๑ˊ•̥▵•)੭₎₎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˘ ³˘)♥" data-k="亲 撒娇 plz 卖萌求求"><span>( ˘ ³˘)♥</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="（＞人＜；）" data-k="拜托 plz 卖萌求求"><span>（＞人＜；）</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・´ｪ｀・)" data-k="可怜 熊 plz 卖萌求求"><span>(・´ｪ｀・)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ｡ﾟ▽ﾟ)੭" data-k="求 卖萌 plz 卖萌求求"><span>( ｡ﾟ▽ﾟ)੭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮ ˙Ⱉ˙ ა" data-k="卖萌 熊 cute 卖萌求求"><span>૮ ˙Ⱉ˙ ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ˊᵕˋ*)੭" data-k="卖萌 递 cute 卖萌求求"><span>(*ˊᵕˋ*)੭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-4" data-c="难过哭泣">
+      <div class="sechead">
+        <h2>难过哭泣</h2>
+        <div class="rule"></div>
+        <span class="count">28 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(╥﹏╥)" data-k="哭 难过 sad cry 难过哭泣"><span>(╥﹏╥)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ˘̩╭╮˘̩)っ" data-k="哭 抱抱 sad 难过哭泣 抱抱 哭 hug 抱抱安慰"><span>(っ˘̩╭╮˘̩)っ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(;´༎ຶД༎ຶ`)" data-k="大哭 sad cry 难过哭泣"><span>(;´༎ຶД༎ຶ`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(｡•́︿•̀｡)" data-k="难过 sad 难过哭泣"><span>(｡•́︿•̀｡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ㄒoㄒ)" data-k="哭 sad cry 难过哭泣"><span>(ㄒoㄒ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(个_个)" data-k="哭 sad 难过哭泣"><span>(个_个)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´;ω;`)" data-k="哭 难过 sad 难过哭泣"><span>(´;ω;`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(T▽T)" data-k="哭 sad cry 难过哭泣"><span>(T▽T)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(｡ŏ﹏ŏ)" data-k="难过 sad 难过哭泣"><span>(｡ŏ﹏ŏ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´-ω-`)" data-k="低落 sad 难过哭泣"><span>(´-ω-`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⌣́_⌣̀)" data-k="失落 sad 难过哭泣"><span>(⌣́_⌣̀)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(;n;)" data-k="哭 sad 难过哭泣"><span>(;n;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´°̥̥̥ω°̥̥̥`)" data-k="含泪 sad 难过哭泣"><span>(´°̥̥̥ω°̥̥̥`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ; ω ; )" data-k="哭 sad 难过哭泣"><span>( ; ω ; )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ノД`)" data-k="哭 sad cry 难过哭泣"><span>(ノД`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="･ﾟ･(つд`ﾟ)･ﾟ･" data-k="大哭 sad cry 难过哭泣"><span>･ﾟ･(つд`ﾟ)･ﾟ･</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ °Д °;)っ" data-k="慌 难过 sad 难过哭泣"><span>(っ °Д °;)っ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´;д;`)" data-k="哭 sad 难过哭泣"><span>(´;д;`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ˘̩╭╮˘̩)" data-k="哭 抱 sad 难过哭泣"><span>(っ˘̩╭╮˘̩)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(｡•́‸ก̀)" data-k="委屈 sad 难过哭泣"><span>(｡•́‸ก̀)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ᗒᗣᗕ)՞" data-k="哭 委屈 sad 难过哭泣"><span>(ᗒᗣᗕ)՞</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ- ‸ -ς)" data-k="失落 sad 难过哭泣"><span>(っ- ‸ -ς)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´•̥̥̥ω•̥̥̥`)" data-k="含泪 sad 难过哭泣"><span>(´•̥̥̥ω•̥̥̥`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◞ ‸ ◟ㆀ)" data-k="失落 sad 难过哭泣"><span>(◞ ‸ ◟ㆀ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ノ_ _)ノ" data-k="崩溃 sad 难过哭泣"><span>(ノ_ _)ノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(｡ᵕ̣̣̣̣̣̣﹏ᵕ̣̣̣̣̣̣｡)" data-k="哭 sad 难过哭泣"><span>(｡ᵕ̣̣̣̣̣̣﹏ᵕ̣̣̣̣̣̣｡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´Д⊂ヽ" data-k="哭 sad 难过哭泣"><span>(´Д⊂ヽ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="｡ﾟ(｡ﾉωヽ｡)ﾟ｡" data-k="大哭 sad 难过哭泣"><span>｡ﾟ(｡ﾉωヽ｡)ﾟ｡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-5" data-c="生气">
+      <div class="sechead">
+        <h2>生气</h2>
+        <div class="rule"></div>
+        <span class="count">26 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(╬ Ò﹏Ó)" data-k="生气 angry 生气"><span>(╬ Ò﹏Ó)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(｀ε´)" data-k="生气 不满 angry 生气"><span>(｀ε´)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(#｀Д´)" data-k="生气 angry 生气"><span>(#｀Д´)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(｀Д´)ﾉ" data-k="暴走 生气 angry 生气"><span>ヽ(｀Д´)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・`ω´・)" data-k="不服 生气 angry 生气"><span>(・`ω´・)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(╯°□°）╯︵ ┻━┻" data-k="掀桌 生气 angry 生气"><span>(╯°□°）╯︵ ┻━┻</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="┻━┻ ︵ヽ(`Д´)ﾉ︵ ┻━┻" data-k="掀桌 暴走 angry 生气"><span>┻━┻ ︵ヽ(`Д´)ﾉ︵ ┻━┻</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾉಥ益ಥ)ﾉ" data-k="崩溃 生气 angry 生气"><span>(ﾉಥ益ಥ)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(¬､¬)" data-k="白眼 不爽 angry 生气"><span>(¬､¬)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＃`Д´)" data-k="生气 angry 生气"><span>(＃`Д´)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(╬ʘ益ʘ╬)۶" data-k="暴怒 angry 生气"><span>٩(╬ʘ益ʘ╬)۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(｀皿´)" data-k="生气 angry 生气"><span>(｀皿´)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(╯‵□′)╯" data-k="掀桌 angry 生气"><span>(╯‵□′)╯</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￢_￢)" data-k="嫌弃 angry 生气"><span>(￢_￢)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(≖､≖)" data-k="阴阳怪气 angry 生气"><span>(≖､≖)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(¬_¬&quot;)" data-k="不爽 angry 生气"><span>(¬_¬&quot;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＞﹏＜)" data-k="抓狂 angry 生气"><span>(＞﹏＜)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*｀ﾛ´)ﾉ" data-k="生气 angry 生气"><span>(*｀ﾛ´)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ`Д´)っ~‡" data-k="生气 打 angry 生气"><span>(っ`Д´)っ~‡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="୧((#Φ益Φ#))୨" data-k="暴怒 angry 生气"><span>୧((#Φ益Φ#))୨</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(҂ `з´ )" data-k="生气 angry 生气"><span>(҂ `з´ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(－‸ლ) " data-k="扶额 angry 生气"><span>(－‸ლ) </span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(#`Д´)ﾉ" data-k="暴走 angry 生气"><span>ヽ(#`Д´)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＃￣0￣)" data-k="哼 生气 angry 生气"><span>(＃￣0￣)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="凸(¬‿¬)" data-k="挑衅 angry 生气"><span>凸(¬‿¬)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾒ￣▽￣)ﾉ" data-k="嚣张 angry 生气"><span>(ﾒ￣▽￣)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-6" data-c="疑惑">
+      <div class="sechead">
+        <h2>疑惑</h2>
+        <div class="rule"></div>
+        <span class="count">12 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(・・?)" data-k="疑惑 问号 what 疑惑"><span>(・・?)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣ω￣;)" data-k="疑惑 尴尬 what 疑惑"><span>(￣ω￣;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´･_･`)" data-k="疑惑 迷茫 what 疑惑"><span>(´･_･`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⊙_⊙)?" data-k="疑惑 what 疑惑"><span>(⊙_⊙)?</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・∀・)?" data-k="疑惑 what 疑惑"><span>(・∀・)?</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ఠ_ఠ" data-k="疑惑 盯 what 疑惑"><span>ఠ_ఠ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・_・;)" data-k="迟疑 尴尬 what 疑惑"><span>(・_・;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="（・□・；）" data-k="疑惑 慌 what 疑惑"><span>（・□・；）</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ーー;)" data-k="无奈 疑惑 what 疑惑"><span>(ーー;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・・;)ゞ" data-k="挠头 疑惑 what 疑惑"><span>(・・;)ゞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(°ロ°)?" data-k="疑惑 what 疑惑"><span>(°ロ°)?</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(͡๏̯͡๏)۶" data-k="迷惑 what 疑惑"><span>٩(͡๏̯͡๏)۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-7" data-c="惊讶">
+      <div class="sechead">
+        <h2>惊讶</h2>
+        <div class="rule"></div>
+        <span class="count">19 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(⊙_⊙)" data-k="惊讶 wow 惊讶"><span>(⊙_⊙)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(°ロ°)" data-k="惊讶 wow 惊讶"><span>(°ロ°)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="Σ(っ °Д °;)っ" data-k="震惊 wow 惊讶"><span>Σ(っ °Д °;)っ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾟдﾟ)" data-k="震惊 wow 惊讶"><span>(ﾟдﾟ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑º ロ º๑)" data-k="惊讶 wow 惊讶"><span>(๑º ロ º๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="Σ(*ﾉ´&gt;ω&lt;)ﾉ" data-k="慌张 惊讶 wow 惊讶"><span>Σ(*ﾉ´&gt;ω&lt;)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⊙o⊙)" data-k="惊讶 wow 惊讶"><span>(⊙o⊙)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="Σ(°Д°;" data-k="震惊 wow 惊讶"><span>Σ(°Д°;</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ʘ ʘ)" data-k="瞪眼 惊讶 wow 惊讶"><span>(ʘ ʘ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="w(°ｏ°)w" data-k="惊讶 wow 惊讶"><span>w(°ｏ°)w</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾟ○ﾟ)!" data-k="惊讶 wow 惊讶"><span>(ﾟ○ﾟ)!</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ﾟﾛﾟ)" data-k="惊讶 wow 惊讶"><span>(*ﾟﾛﾟ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⊙ˍ⊙)" data-k="呆住 wow 惊讶"><span>(⊙ˍ⊙)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾟΩﾟ)" data-k="震惊 wow 惊讶"><span>(ﾟΩﾟ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="Σ(-᷅_-᷄๑)" data-k="震惊 wow 惊讶"><span>Σ(-᷅_-᷄๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´⊙ω⊙`)!" data-k="惊讶 wow 惊讶"><span>(´⊙ω⊙`)!</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="Σ(￣□￣;)" data-k="震惊 wow 惊讶"><span>Σ(￣□￣;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(°д°;)" data-k="惊 慌 wow 惊讶"><span>(°д°;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="щ(ºДºщ)" data-k="崩溃 惊 wow 惊讶"><span>щ(ºДºщ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-8" data-c="无语冷漠">
+      <div class="sechead">
+        <h2>无语冷漠</h2>
+        <div class="rule"></div>
+        <span class="count">25 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(－_－)" data-k="无语 无奈 meh 无语冷漠"><span>(－_－)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(¬_¬)" data-k="白眼 无语 meh 无语冷漠"><span>(¬_¬)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣ー￣)" data-k="冷漠 meh 无语冷漠"><span>(￣ー￣)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´_ゝ`)" data-k="敷衍 meh 无语冷漠"><span>(´_ゝ`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ー_ー)!!" data-k="无语 meh 无语冷漠"><span>(ー_ー)!!</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˘･з･)" data-k="嘴硬 无语 meh 无语冷漠"><span>( ˘･з･)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(－‸ლ)" data-k="扶额 无语 meh 无语冷漠"><span>(－‸ლ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="¯\_(ツ)_/¯" data-k="耸肩 随便 meh shrug 无语冷漠"><span>¯\_(ツ)_/¯</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(」°ロ°)」" data-k="崩溃 呐喊 meh 无语冷漠"><span>(」°ロ°)」</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・_・ヾ" data-k="挠头 无语 meh 无语冷漠"><span>(・_・ヾ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(눈_눈)" data-k="无语 meh 无语冷漠"><span>(눈_눈)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ͡° ͜ʖ ͡°)" data-k="坏笑 meh 无语冷漠"><span>( ͡° ͜ʖ ͡°)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´・ω・`)" data-k="失望 平淡 meh 无语冷漠"><span>(´・ω・`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(=_=)" data-k="疲惫 无语 meh 无语冷漠"><span>(=_=)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(¬､¬ )" data-k="斜眼 meh 无语冷漠"><span>(¬､¬ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(－д－)" data-k="闭眼 无语 meh 无语冷漠"><span>(－д－)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˘_˘ )" data-k="面无表情 meh 无语冷漠"><span>( ˘_˘ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣_￣|||)" data-k="汗 无语 meh 无语冷漠"><span>(￣_￣|||)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・ε・`*)" data-k="嘟嘴 无奈 meh 无语冷漠"><span>(・ε・`*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(눈_눈;)" data-k="无语 meh 无语冷漠"><span>(눈_눈;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ㆆ_ㆆ)" data-k="麻木 meh 无语冷漠"><span>(ㆆ_ㆆ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="乁( ⁰͡ Ĺ̯ ⁰͡ ) ㄏ" data-k="摊手 无语 shrug 无语冷漠"><span>乁( ⁰͡ Ĺ̯ ⁰͡ ) ㄏ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="╮(╯_╰)╭" data-k="摊手 无所谓 shrug 无语冷漠"><span>╮(╯_╰)╭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="╮(￣▽￣)╭" data-k="摊手 随便 shrug 无语冷漠"><span>╮(￣▽￣)╭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(-, - )" data-k="困 无语 meh 无语冷漠"><span>(-, - )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-9" data-c="困了睡了">
+      <div class="sechead">
+        <h2>困了睡了</h2>
+        <div class="rule"></div>
+        <span class="count">18 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(－ω－) zzZ" data-k="困 睡觉 sleep 困了睡了"><span>(－ω－) zzZ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´-ω-`)…zzZ" data-k="困 睡觉 sleep 困了睡了"><span>(´-ω-`)…zzZ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˘ω˘ )ｽﾔｧ" data-k="睡着 sleep 困了睡了"><span>( ˘ω˘ )ｽﾔｧ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(。-ω-)zzz" data-k="困 睡觉 sleep 困了睡了"><span>(。-ω-)zzz</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＿ ＿)zzz" data-k="趴下 睡 sleep 困了睡了"><span>(＿ ＿)zzz</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮ ᶻ 𝗓 𐰁 ა" data-k="睡觉 可爱 sleep 困了睡了"><span>૮ ᶻ 𝗓 𐰁 ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(-, - )…zzZ" data-k="困 sleep 困了睡了"><span>(-, - )…zzZ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ᵕ ᵕ̩̩)" data-k="迷糊 困 sleep 困了睡了"><span>(ᵕ ᵕ̩̩)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="_(:3」∠)_" data-k="瘫 躺平 sleep 困了睡了"><span>_(:3」∠)_</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´ぅω・`)" data-k="迷糊 困 sleep 困了睡了"><span>(´ぅω・`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(∪｡∪)｡｡｡zzz" data-k="睡 狗 sleep 困了睡了 狗 睡 sleep 困了睡了"><span>(∪｡∪)｡｡｡zzz</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´〜｀*) zzz" data-k="困 sleep 困了睡了"><span>(´〜｀*) zzz</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍ ˃ ⤙ ˂ ₎ა zzZ" data-k="困 sleep 困了睡了"><span>૮₍ ˃ ⤙ ˂ ₎ა zzZ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˘ω˘ ) zzZ" data-k="睡着 sleep 困了睡了"><span>( ˘ω˘ ) zzZ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＿o＿)" data-k="趴倒 sleep 困了睡了"><span>(＿o＿)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(－_－) zzZ" data-k="睡 sleep 困了睡了"><span>(－_－) zzZ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ᴗ_ᴗ｡)" data-k="闭眼 困 sleep 困了睡了"><span>(ᴗ_ᴗ｡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(꒪⌓꒪)" data-k="没睡醒 sleep 困了睡了"><span>(꒪⌓꒪)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-10" data-c="小动物">
+      <div class="sechead">
+        <h2>小动物</h2>
+        <div class="rule"></div>
+        <span class="count">49 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(=^･ω･^=)" data-k="猫 cat 小动物"><span>(=^･ω･^=)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ﾉ(=･ｪ･=)ﾉ" data-k="猫 打招呼 cat 小动物"><span>ﾉ(=･ｪ･=)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾐ๑˃ᴗ˂๑ﾐ)" data-k="猫 开心 cat 小动物"><span>(ﾐ๑˃ᴗ˂๑ﾐ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(=①ω①=)" data-k="猫 cat 小动物"><span>(=①ω①=)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="/ᐠ｡ꞈ｡ᐟ\" data-k="猫 cat 小动物"><span>/ᐠ｡ꞈ｡ᐟ\</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᓚᘏᗢ" data-k="猫 趴 cat 小动物 猫 趴 cat 小动物"><span>ᓚᘏᗢ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(=^-ω-^=)" data-k="猫 眯眼 cat 小动物"><span>(=^-ω-^=)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ•ᴥ•ʔ" data-k="熊 bear 小动物"><span>ʕ•ᴥ•ʔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ￫ᴥ￩ʔ" data-k="熊 bear 小动物"><span>ʕ￫ᴥ￩ʔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ•̀ω•́ʔ✧" data-k="熊 有干劲 bear 小动物"><span>ʕ•̀ω•́ʔ✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(•ㅅ•)" data-k="兔子 rabbit 小动物"><span>(•ㅅ•)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="/(•ㅅ•)\" data-k="兔子 rabbit 小动物"><span>/(•ㅅ•)\</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍´˶•⤙•˶₎ა" data-k="兔 可爱 rabbit 小动物"><span>૮₍´˶•⤙•˶₎ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˃́ꇴ˂̀๑)" data-k="小动物 开心 cute 小动物"><span>(๑˃́ꇴ˂̀๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᶘ ᵒᴥᵒᶅ" data-k="海豹 狗 seal 小动物 海豹 seal 小动物"><span>ᶘ ᵒᴥᵒᶅ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・㉨・)" data-k="熊 狗 dog 小动物"><span>(・㉨・)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣(∞)￣)" data-k="猪 pig 小动物"><span>(￣(∞)￣)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・θ・)" data-k="小鸟 bird 小动物"><span>(・θ・)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ᴗ͈ˬᴗ͈)ꕤ" data-k="小动物 花 cute 小动物"><span>(*ᴗ͈ˬᴗ͈)ꕤ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="&lt;(￣︶￣)&gt;" data-k="企鹅 penguin 小动物"><span>&lt;(￣︶￣)&gt;</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◔ᴥ◔)" data-k="小狗 dog 小动物"><span>(◔ᴥ◔)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ◔◡◔)っ" data-k="递东西 可爱 cute 小动物"><span>(っ◔◡◔)っ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(=^･ω･^=)丿" data-k="猫 打招呼 cat 小动物"><span>ヽ(=^･ω･^=)丿</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(๑･ω･๑)۶" data-k="小动物 加油 cute 小动物"><span>٩(๑･ω･๑)۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ฅ^•ﻌ•^ฅ" data-k="猫爪 cat 小动物"><span>ฅ^•ﻌ•^ฅ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ฅ(≈&gt;ܫ&lt;≈)ฅ" data-k="猫 开心 cat 小动物"><span>ฅ(≈&gt;ܫ&lt;≈)ฅ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(=ﾟ㉨ﾟ=)" data-k="猫 熊 cat 小动物"><span>(=ﾟ㉨ﾟ=)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="/ᐠ - ˕ -マ" data-k="猫 cat 小动物"><span>/ᐠ - ˕ -マ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="/ᐠ˵- ⩊ -˵マ" data-k="猫 睡 cat 小动物"><span>/ᐠ˵- ⩊ -˵マ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(^･o･^)ﾉ&quot;" data-k="猫 招手 cat 小动物"><span>(^･o･^)ﾉ&quot;</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ฅ(^･ω･^ฅ)" data-k="猫爪 cat 小动物"><span>ฅ(^･ω･^ฅ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ｡•ᴥ•｡ʔ" data-k="熊 bear 小动物"><span>ʕ｡•ᴥ•｡ʔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ ᵔᴥᵔ ʔ" data-k="熊 开心 bear 小动物"><span>ʕ ᵔᴥᵔ ʔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕっ•ᴥ•ʔっ" data-k="熊 抱 bear 小动物"><span>ʕっ•ᴥ•ʔっ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ෆ˙ᵕ˙ෆ)" data-k="小动物 可爱 cute 小动物"><span>(ෆ˙ᵕ˙ෆ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＾• ω •＾)" data-k="猫 cat 小动物"><span>(＾• ω •＾)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮ ・ ﻌ ・ ა" data-k="狗 猫 dog 小动物"><span>૮ ・ ﻌ ・ ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・ω・)つ⊂(・ω・)" data-k="两只 抱 cute 小动物"><span>(・ω・)つ⊂(・ω・)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ·ᴥ·ʔ" data-k="熊 bear 小动物"><span>ʕ·ᴥ·ʔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⁎˃ᆺ˂)" data-k="兔 开心 rabbit 小动物"><span>(⁎˃ᆺ˂)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑ơ ₃ ơ)" data-k="亲 小动物 cute 小动物"><span>(๑ơ ₃ ơ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´・ᴗ・ ` )" data-k="温柔 cute 小动物"><span>(´・ᴗ・ ` )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="V•ᴥ•V" data-k="狗 dog 小动物"><span>V•ᴥ•V</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="୧( ⁼̴̶̤̀ω⁼̴̶̤́ )૭" data-k="小动物 加油 cute 小动物"><span>୧( ⁼̴̶̤̀ω⁼̴̶̤́ )૭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ᵔᴥᵔ)" data-k="狗 开心 dog 小动物"><span>(ᵔᴥᵔ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・(ェ)・)" data-k="熊 bear 小动物"><span>(・(ェ)・)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´(ｴ)｀)" data-k="熊 bear 小动物"><span>(´(ｴ)｀)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(=ↀωↀ=)" data-k="猫 cat 小动物"><span>(=ↀωↀ=)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾐ⚈ ﻌ ⚈ﾐ)" data-k="猫 惊 cat 小动物"><span>(ﾐ⚈ ﻌ ⚈ﾐ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-11" data-c="打招呼">
+      <div class="sechead">
+        <h2>打招呼</h2>
+        <div class="rule"></div>
+        <span class="count">22 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(・ω・)ノ" data-k="你好 招手 hi 打招呼"><span>(・ω・)ノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヾ(＾∇＾)" data-k="你好 hi 打招呼"><span>ヾ(＾∇＾)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*・ω・)ﾉ" data-k="你好 hi 打招呼"><span>(*・ω・)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(・∀・)ﾉ" data-k="你好 hi 打招呼"><span>ヽ(・∀・)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(o´▽`o)ﾉ" data-k="你好 hi 打招呼"><span>(o´▽`o)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ノ( ' - ' ノ)" data-k="挥手 hi 打招呼"><span>ノ( ' - ' ノ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⌒▽⌒)ﾉ" data-k="你好 hi 打招呼"><span>(⌒▽⌒)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ•ᴥ•ʔﾉ" data-k="熊 你好 hi bear 打招呼"><span>ʕ•ᴥ•ʔﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(=ﾟωﾟ)ﾉ" data-k="你好 hi 打招呼"><span>(=ﾟωﾟ)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(｡･ω･)ﾉﾞ" data-k="再见 拜拜 bye 打招呼"><span>(｡･ω･)ﾉﾞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(^_^)/" data-k="你好 hi 打招呼"><span>(^_^)/</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ﾉ" data-k="挥手 零件 hi 打招呼 手 挥 零件 脸的零件 手 挥 零件 脸的零件"><span>ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ﾟ▽ﾟ)ﾉ" data-k="你好 hi 打招呼"><span>(*ﾟ▽ﾟ)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・∀・)ノ" data-k="你好 hi 打招呼"><span>(・∀・)ノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヾ(・ω・*)" data-k="你好 hi 打招呼"><span>ヾ(・ω・*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´• ω •`)ﾉ" data-k="你好 hi 打招呼"><span>(´• ω •`)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="＼(・ω・＼)" data-k="招手 hi 打招呼"><span>＼(・ω・＼)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(／・ω・)／" data-k="招手 hi 打招呼"><span>(／・ω・)／</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾉ･ω･)ﾉﾞ" data-k="拜拜 bye 打招呼"><span>(ﾉ･ω･)ﾉﾞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´｡• ω •｡`)ﾉ" data-k="你好 hi 打招呼"><span>(´｡• ω •｡`)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヾ(＾-＾)ノ" data-k="再见 bye 打招呼"><span>ヾ(＾-＾)ノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ゝω・)ﾉ" data-k="眨眼 你好 hi 打招呼"><span>(*ゝω・)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-12" data-c="庆祝跳舞">
+      <div class="sechead">
+        <h2>庆祝跳舞</h2>
+        <div class="rule"></div>
+        <span class="count">13 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="＼(^o^)／" data-k="欢呼 庆祝 yay 庆祝跳舞"><span>＼(^o^)／</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(◕‿◕｡)۶" data-k="庆祝 开心 yay 庆祝跳舞"><span>٩(◕‿◕｡)۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="＼(≧▽≦)／" data-k="欢呼 yay 庆祝跳舞"><span>＼(≧▽≦)／</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♪(´▽｀)" data-k="哼歌 开心 music 庆祝跳舞"><span>♪(´▽｀)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヾ(≧▽≦*)o" data-k="庆祝 yay 庆祝跳舞"><span>ヾ(≧▽≦*)o</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ˘▽˘)っ" data-k="抱住 开心 yay 庆祝跳舞 抱住 hug 抱抱安慰"><span>(っ˘▽˘)っ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(⌐■_■)ノ♪♬" data-k="跳舞 音乐 dance 庆祝跳舞"><span>ヽ(⌐■_■)ノ♪♬</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="└(=^‥^=)┐" data-k="猫 跳舞 dance cat 庆祝跳舞"><span>└(=^‥^=)┐</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ノ^_^)ノ" data-k="欢呼 yay 庆祝跳舞"><span>(ノ^_^)ノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♪┏(・o･)┛♪" data-k="跳舞 dance 庆祝跳舞"><span>♪┏(・o･)┛♪</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᕕ( ᐛ )ᕗ" data-k="跑 冲 go 庆祝跳舞"><span>ᕕ( ᐛ )ᕗ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(*⌒▽⌒*)ﾉ" data-k="庆祝 yay 庆祝跳舞"><span>ヽ(*⌒▽⌒*)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(๑❛ᴗ❛๑)۶" data-k="庆祝 开心 yay 庆祝跳舞"><span>٩(๑❛ᴗ❛๑)۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-13" data-c="动作手势">
+      <div class="sechead">
+        <h2>动作手势</h2>
+        <div class="rule"></div>
+        <span class="count">17 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(っ'ヮ')っ" data-k="抱抱 hug 动作手势"><span>(っ'ヮ')っ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(つ✧ω✧)つ" data-k="抱 期待 hug 动作手势"><span>(つ✧ω✧)つ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="＼(￣▽￣)/" data-k="张开手 yay 动作手势 张开手 抱 hug 抱抱安慰"><span>＼(￣▽￣)/</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣^￣)ゞ" data-k="敬礼 salute 动作手势"><span>(￣^￣)ゞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ･ω･)☞" data-k="指 就是你 point 动作手势"><span>( ･ω･)☞</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ง'̀-'́)ง" data-k="打架 加油 fight 动作手势"><span>(ง'̀-'́)ง</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(•̀ᴗ•́)و ̑̑" data-k="加油 fight 动作手势"><span>(•̀ᴗ•́)و ̑̑</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ๑˃̶ ꇴ ˂̶)ﻭ" data-k="加油 fight 动作手势"><span>( ๑˃̶ ꇴ ˂̶)ﻭ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="＼(^ω^)人(^ω^)／" data-k="击掌 好朋友 friend 动作手势"><span>＼(^ω^)人(^ω^)／</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾉ*･ω･)ﾉ" data-k="丢 扔 throw 动作手势"><span>(ﾉ*･ω･)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑•̀ㅂ•́)و✧" data-k="加油 有干劲 fight 动作手势"><span>(๑•̀ㅂ•́)و✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＾人＾)" data-k="拜托 祈祷 pray 动作手势"><span>(＾人＾)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(-ω-;)ゞ" data-k="挠头 抱歉 sorry 动作手势"><span>(-ω-;)ゞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="m(_ _)m" data-k="鞠躬 抱歉 sorry 动作手势"><span>m(_ _)m</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*・∀・)/♡\(・∀・*)" data-k="一起 爱心 love 动作手势"><span>(*・∀・)/♡\(・∀・*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(๑ᵒ̴̶̷͈᷄ᗨᵒ̴̶̷͈᷅)و" data-k="拼命加油 fight 动作手势"><span>٩(๑ᵒ̴̶̷͈᷄ᗨᵒ̴̶̷͈᷅)و</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ˘ω˘ς)" data-k="害羞 递 shy 动作手势"><span>(っ˘ω˘ς)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-14" data-c="期待兴奋">
+      <div class="sechead">
+        <h2>期待兴奋</h2>
+        <div class="rule"></div>
+        <span class="count">12 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(*ﾟ▽ﾟ*)" data-k="期待 excited 期待兴奋"><span>(*ﾟ▽ﾟ*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(☆▽☆)" data-k="星星眼 excited 期待兴奋"><span>(☆▽☆)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(✧ω✧)" data-k="星星眼 excited 期待兴奋"><span>(✧ω✧)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(★ω★)" data-k="星星眼 excited 期待兴奋"><span>(★ω★)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⁎˃ᴗ˂⁎)" data-k="兴奋 excited 期待兴奋"><span>(⁎˃ᴗ˂⁎)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑✧∀✧๑)" data-k="期待 excited 期待兴奋"><span>(๑✧∀✧๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="o(*°▽°*)o" data-k="兴奋 excited 期待兴奋"><span>o(*°▽°*)o</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✧*｡٩(ˊᗜˋ*)و✧*｡" data-k="兴奋 闪 excited 期待兴奋"><span>✧*｡٩(ˊᗜˋ*)و✧*｡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑&gt;ᗨ&lt;๑)" data-k="期待 excited 期待兴奋"><span>(๑&gt;ᗨ&lt;๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⁄ ⁄•⁄ω⁄•⁄ ⁄)✧" data-k="期待 害羞 excited 期待兴奋"><span>(⁄ ⁄•⁄ω⁄•⁄ ⁄)✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◍•ᴗ•◍)✧*｡" data-k="期待 excited 期待兴奋"><span>(◍•ᴗ•◍)✧*｡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍˶ᵔ ᵕ ᵔ˶₎ა✧" data-k="期待 可爱 excited 期待兴奋"><span>૮₍˶ᵔ ᵕ ᵔ˶₎ა✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-15" data-c="吃东西">
+      <div class="sechead">
+        <h2>吃东西</h2>
+        <div class="rule"></div>
+        <span class="count">16 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(っ˘ڡ˘ς)" data-k="好吃 馋 food 吃东西"><span>(っ˘ڡ˘ς)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑´ڡ`๑)" data-k="好吃 满足 food 吃东西"><span>(๑´ڡ`๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*´﹃｀*)" data-k="馋 流口水 food 吃东西"><span>(*´﹃｀*)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑&gt;ڡ&lt;)☆" data-k="好吃 food 吃东西"><span>(๑&gt;ڡ&lt;)☆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(๑´ڡ`๑)ﾉ" data-k="好吃 food 吃东西"><span>ヽ(๑´ڡ`๑)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˘ڡ˘ )" data-k="舔嘴 food 吃东西"><span>( ˘ڡ˘ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＾q＾)" data-k="张嘴 吃 food 吃东西"><span>(＾q＾)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ºΔº )" data-k="张嘴 food 吃东西"><span>( ºΔº )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="Ψ(￣∀￣)Ψ" data-k="开动 food 吃东西"><span>Ψ(￣∀￣)Ψ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑ᵔ⤙ᵔ๑) " data-k="满足 吃 food 吃东西"><span>(๑ᵔ⤙ᵔ๑) </span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ￣ω￣)＝3" data-k="吃饱 food 吃东西"><span>( ￣ω￣)＝3</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ˘▽˘)っ♨" data-k="热饮 喝 food 吃东西"><span>(っ˘▽˘)っ♨</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´～`)ﾓｸﾞﾓｸﾞ" data-k="嚼 吃 food 吃东西"><span>(´～`)ﾓｸﾞﾓｸﾞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="＼(￣▽￣)／" data-k="干杯 cheers food 吃东西"><span>＼(￣▽￣)／</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾉ≧ڡ≦)" data-k="好吃 food 吃东西"><span>(ﾉ≧ڡ≦)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑´ω`๑)♨" data-k="喝汤 food 吃东西"><span>(๑´ω`๑)♨</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-16" data-c="累了打工">
+      <div class="sechead">
+        <h2>累了打工</h2>
+        <div class="rule"></div>
+        <span class="count">16 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(´Д｀)" data-k="累 叹气 tired 累了打工"><span>(´Д｀)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="_(:3 」∠ )_" data-k="躺平 累 tired 累了打工"><span>_(:3 」∠ )_</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾉ_ _)ﾉ" data-k="瘫倒 tired 累了打工"><span>(ﾉ_ _)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´ཀ`」 ∠)" data-k="累 摊 tired 累了打工"><span>(´ཀ`」 ∠)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="o(TヘTo)" data-k="委屈 累 tired 累了打工"><span>o(TヘTo)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ﹏-) .｡oO" data-k="困 累 tired 累了打工"><span>(っ﹏-) .｡oO</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(‾▿‾)" data-k="摆烂 tired 累了打工"><span>(‾▿‾)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="＿|￣|○" data-k="跪 倒地 tired 累了打工"><span>＿|￣|○</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="○| ￣|_" data-k="跪 沮丧 tired 累了打工"><span>○| ￣|_</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="orz" data-k="跪 佩服 tired 累了打工"><span>orz</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="OTZ" data-k="跪 无力 tired 累了打工"><span>OTZ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(」＞ω＜)」" data-k="崩溃 tired 累了打工"><span>(」＞ω＜)」</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑•́ ₃ •̀๑)ﾌﾟﾝ" data-k="不干了 tired 累了打工"><span>(๑•́ ₃ •̀๑)ﾌﾟﾝ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´-`).｡oO" data-k="发呆 想 tired 累了打工"><span>(´-`).｡oO</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣ε￣〃)ブーブー" data-k="抱怨 tired 累了打工"><span>(￣ε￣〃)ブーブー</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´ω｀)zzz" data-k="没力气 tired 累了打工"><span>(´ω｀)zzz</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-17" data-c="加油鼓励">
+      <div class="sechead">
+        <h2>加油鼓励</h2>
+        <div class="rule"></div>
+        <span class="count">13 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(ง •̀_•́)ง" data-k="加油 fight 加油鼓励"><span>(ง •̀_•́)ง</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(๑•̀ω•́๑)۶" data-k="加油 fight 加油鼓励"><span>٩(๑•̀ω•́๑)۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="o(*≧▽≦)ツ" data-k="加油 fight 加油鼓励"><span>o(*≧▽≦)ツ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᕦ(ò_óˇ)ᕤ" data-k="加油 肌肉 fight 加油鼓励"><span>ᕦ(ò_óˇ)ᕤ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑•̀ㅁ•́๑)✧" data-k="加油 认真 fight 加油鼓励"><span>(๑•̀ㅁ•́๑)✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(ˊᗜˋ*)و ✧" data-k="加油 fight 加油鼓励"><span>٩(ˊᗜˋ*)و ✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="୧(๑•̀ᗝ•́)૭" data-k="加油 fight 加油鼓励"><span>୧(๑•̀ᗝ•́)૭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˃ᴗ˂)ﻭ✧" data-k="加油 fight 加油鼓励"><span>(๑˃ᴗ˂)ﻭ✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(•̤̀ᵕ•̤́๑)" data-k="没问题 加油 fight 加油鼓励"><span>٩(•̤̀ᵕ•̤́๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᕙ(⇀‸↼‶)ᕗ" data-k="肌肉 加油 fight 加油鼓励"><span>ᕙ(⇀‸↼‶)ᕗ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑و•̀ω•́)و" data-k="加油 fight 加油鼓励"><span>(๑و•̀ω•́)و</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="୧⍢⃝୨" data-k="冲 加油 fight 加油鼓励"><span>୧⍢⃝୨</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩( ᐛ )و" data-k="加油 憨 fight 加油鼓励"><span>٩( ᐛ )و</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-18" data-c="谢谢道歉">
+      <div class="sechead">
+        <h2>谢谢道歉</h2>
+        <div class="rule"></div>
+        <span class="count">10 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(*- -)(*_ _)" data-k="鞠躬 谢谢 thanks 谢谢道歉"><span>(*- -)(*_ _)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*・ω・)*_ _))" data-k="鞠躬 谢谢 thanks 谢谢道歉"><span>(*・ω・)*_ _))</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ´ω`c)" data-k="谢谢 感动 thanks 谢谢道歉"><span>(っ´ω`c)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(_ _ヽ)" data-k="鞠躬 道歉 sorry 谢谢道歉"><span>ヽ(_ _ヽ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・ω・)ゞ" data-k="抱歉 sorry 谢谢道歉"><span>(・ω・)ゞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⌒_⌒;)" data-k="尴尬 抱歉 sorry 谢谢道歉"><span>(⌒_⌒;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣▽￣)ゞ" data-k="抱歉 sorry 谢谢道歉"><span>(￣▽￣)ゞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(_ _)" data-k="低头 道歉 sorry 谢谢道歉"><span>(_ _)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(-ω-、)" data-k="反省 sorry 谢谢道歉"><span>(-ω-、)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="੭ ˙ᵕ˙ )੭" data-k="递上 谢谢 thanks 谢谢道歉"><span>੭ ˙ᵕ˙ )੭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-19" data-c="尴尬心虚">
+      <div class="sechead">
+        <h2>尴尬心虚</h2>
+        <div class="rule"></div>
+        <span class="count">9 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(・∀・;)" data-k="尴尬 awkward 尴尬心虚"><span>(・∀・;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣▽￣;)" data-k="尴尬 awkward 尴尬心虚"><span>(￣▽￣;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(；・∀・)" data-k="心虚 awkward 尴尬心虚"><span>(；・∀・)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⌒▽⌒;)" data-k="尴尬笑 awkward 尴尬心虚"><span>(⌒▽⌒;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＾＾;)" data-k="尴尬 awkward 尴尬心虚"><span>(＾＾;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣∇￣;)ゞ" data-k="尴尬 awkward 尴尬心虚"><span>(￣∇￣;)ゞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑•̥ ᵕ •̥๑)" data-k="心虚 awkward 尴尬心虚"><span>(๑•̥ ᵕ •̥๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・_・;)ゞ" data-k="挠头 awkward 尴尬心虚"><span>(・_・;)ゞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(°∀°;)" data-k="慌 尴尬 awkward 尴尬心虚"><span>(°∀°;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-20" data-c="得意骄傲">
+      <div class="sechead">
+        <h2>得意骄傲</h2>
+        <div class="rule"></div>
+        <span class="count">12 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(・∀・)ﾆﾔﾆﾔ" data-k="坏笑 得意 proud 得意骄傲"><span>(・∀・)ﾆﾔﾆﾔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(¬‿¬)" data-k="坏笑 proud 得意骄傲"><span>(¬‿¬)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＾～＾)" data-k="得意 proud 得意骄傲"><span>(＾～＾)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣ー￣)ｂ" data-k="赞 proud 得意骄傲"><span>(￣ー￣)ｂ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="d(´▽｀)b" data-k="赞 proud 得意骄傲"><span>d(´▽｀)b</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(・∀・)b" data-k="好 赞 proud 得意骄傲"><span>(・∀・)b</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ✧≖ ‿ ≖)" data-k="奸笑 proud 得意骄傲"><span>( ✧≖ ‿ ≖)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣︶￣)↗" data-k="得意 proud 得意骄傲"><span>(￣︶￣)↗</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˃̵ᴗ˂̵)و" data-k="得意 开心 proud 得意骄傲"><span>(๑˃̵ᴗ˂̵)و</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⌐■_■)" data-k="酷 墨镜 cool 得意骄傲"><span>(⌐■_■)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᕕ(⌐■_■)ᕗ" data-k="酷 跑 cool 得意骄傲"><span>ᕕ(⌐■_■)ᕗ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(◣_◢)" data-k="严肃 酷 cool 得意骄傲"><span>(◣_◢)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-21" data-c="偷看躲藏">
+      <div class="sechead">
+        <h2>偷看躲藏</h2>
+        <div class="rule"></div>
+        <span class="count">9 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="|д･)" data-k="偷看 peek 偷看躲藏"><span>|д･)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="|ω･`)" data-k="偷看 peek 偷看躲藏"><span>|ω･`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="|ω・`)ノ" data-k="偷看 招手 peek 偷看躲藏"><span>|ω・`)ノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="┬┴┬┴┤(･_├┬┴┬┴" data-k="墙后偷看 peek 偷看躲藏"><span>┬┴┬┴┤(･_├┬┴┬┴</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="|ｏ･_･)ﾉ" data-k="偷看 peek 偷看躲藏"><span>|ｏ･_･)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="|_･)" data-k="躲 偷看 peek 偷看躲藏"><span>|_･)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="┬┴┬┴┤･ω･)ﾉ" data-k="偷看 招手 peek 偷看躲藏"><span>┬┴┬┴┤･ω･)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⊃‿⊂)" data-k="捂眼 偷看 peek 偷看躲藏"><span>(⊃‿⊂)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑•́ ₃ •̀๑)⁾⁾" data-k="探头 peek 偷看躲藏"><span>(๑•́ ₃ •̀๑)⁾⁾</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-22" data-c="魔法撒花">
+      <div class="sechead">
+        <h2>魔法撒花</h2>
+        <div class="rule"></div>
+        <span class="count">10 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(ﾉ*・ω・)ﾉ*:･ﾟ✧" data-k="撒花 magic 魔法撒花"><span>(ﾉ*・ω・)ﾉ*:･ﾟ✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(∩｡•ᴗ•｡)⊃━☆ﾟ.*" data-k="魔法棒 magic 魔法撒花"><span>(∩｡•ᴗ•｡)⊃━☆ﾟ.*</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="─=≡Σ((( つ•̀ω•́)つ" data-k="冲 magic 魔法撒花"><span>─=≡Σ((( つ•̀ω•́)つ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧" data-k="撒花 魔法 magic 魔法撒花"><span>(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍ ˃ᴗ˂ ₎ა✧" data-k="开心 闪 magic 魔法撒花"><span>૮₍ ˃ᴗ˂ ₎ა✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☆彡" data-k="流星 star magic 魔法撒花"><span>☆彡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="彡" data-k="风 线 magic 魔法撒花"><span>彡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*ﾉ˃̶ᗜ˂̶)ﾉ" data-k="害羞 兴奋 magic 魔法撒花"><span>(*ﾉ˃̶ᗜ˂̶)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="･*･:≡( ε:)" data-k="溜走 冲 magic 魔法撒花"><span>･*･:≡( ε:)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="＼(★ω★)／" data-k="兴奋 闪 magic 魔法撒花"><span>＼(★ω★)／</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-23" data-c="音乐">
+      <div class="sechead">
+        <h2>音乐</h2>
+        <div class="rule"></div>
+        <span class="count">9 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="♪(´ε｀ )" data-k="唱歌 music 音乐"><span>♪(´ε｀ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♬♩♪♩" data-k="音符 music 音乐"><span>♬♩♪♩</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(o´∀`)ﾉ♪♬" data-k="跳舞 唱歌 music 音乐"><span>ヽ(o´∀`)ﾉ♪♬</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(♪◔◡◔)" data-k="听歌 music 音乐"><span>(♪◔◡◔)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♫彡" data-k="音符 飘 music 音乐"><span>♫彡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヾ(⌐■_■)ノ♪" data-k="墨镜 跳舞 music 音乐"><span>ヾ(⌐■_■)ノ♪</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(￣▽￣)/♫•*¨*•.¸¸♪" data-k="音乐 music 音乐"><span>(￣▽￣)/♫•*¨*•.¸¸♪</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(◕‿◕)۶♫" data-k="唱歌 music 音乐"><span>٩(◕‿◕)۶♫</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♪~♪~♪" data-k="音符 music 音乐"><span>♪~♪~♪</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-24" data-c="沙雕恶搞">
+      <div class="sechead">
+        <h2>沙雕恶搞</h2>
+        <div class="rule"></div>
+        <span class="count">17 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="( ͡~ ͜ʖ ͡°)" data-k="挑眉 沙雕 funny 沙雕恶搞"><span>( ͡~ ͜ʖ ͡°)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ(ﾟДﾟ)ﾉ" data-k="震惊 沙雕 funny 沙雕恶搞"><span>ヽ(ﾟДﾟ)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(☞ﾟヮﾟ)☞" data-k="就是你 funny 沙雕恶搞"><span>(☞ﾟヮﾟ)☞</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☜(ﾟヮﾟ☜)" data-k="就是你 funny 沙雕恶搞"><span>☜(ﾟヮﾟ☜)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(╯︵╰,)" data-k="哭 funny 沙雕恶搞"><span>(╯︵╰,)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ ⊙ᴥ⊙ ʔ" data-k="呆 熊 funny 沙雕恶搞"><span>ʕ ⊙ᴥ⊙ ʔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ﾟ∀ﾟ)" data-k="傻笑 funny 沙雕恶搞"><span>(ﾟ∀ﾟ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⚆_⚆)" data-k="呆 惊 funny 沙雕恶搞"><span>(⚆_⚆)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ಠ_ಠ)" data-k="嫌弃 funny 沙雕恶搞"><span>(ಠ_ಠ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ಥ_ಥ)" data-k="哭 funny 沙雕恶搞"><span>(ಥ_ಥ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ノ°益°)ノ" data-k="暴走 funny 沙雕恶搞"><span>(ノ°益°)ノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(҂◡_◡)" data-k="疲惫 funny 沙雕恶搞"><span>(҂◡_◡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´◔ ω ◔`)" data-k="呆 funny 沙雕恶搞"><span>(´◔ ω ◔`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="┬─┬ノ( º _ ºノ)" data-k="摆好桌子 消气 funny 沙雕恶搞"><span>┬─┬ノ( º _ ºノ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="[¬º-°]¬" data-k="僵尸 funny 沙雕恶搞"><span>[¬º-°]¬</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(•_•) ( •_•)&gt;⌐■-■ (⌐■_■)" data-k="戴墨镜 cool funny 沙雕恶搞"><span>(•_•) ( •_•)&gt;⌐■-■ (⌐■_■)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ᵔᴥᵔ)ﾉ" data-k="憨 funny 沙雕恶搞"><span>(ᵔᴥᵔ)ﾉ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-25" data-c="韩系颜文字">
+      <div class="sechead">
+        <h2>韩系颜文字</h2>
+        <div class="rule"></div>
+        <span class="count">12 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(ㅇㅅㅇ)" data-k="韩系 呆 korean 韩系颜文字"><span>(ㅇㅅㅇ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ㅅ¯ ³¯)" data-k="韩系 亲 korean 韩系颜文字"><span>(ㅅ¯ ³¯)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ㅠ_ㅠ)" data-k="哭 韩系 korean 韩系颜文字"><span>(ㅠ_ㅠ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ㅜㅜ)" data-k="哭 韩系 korean 韩系颜文字"><span>(ㅜㅜ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑ㅂ๑)" data-k="韩系 呆 korean 韩系颜文字"><span>(๑ㅂ๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＊❛ᴗ❛＊)" data-k="开心 韩系 korean 韩系颜文字"><span>(＊❛ᴗ❛＊)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⌒ヮ⌒)" data-k="开心 korean 韩系颜文字"><span>(⌒ヮ⌒)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ㅎㅅㅎ" data-k="笑 韩系 korean 韩系颜文字"><span>ㅎㅅㅎ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ㆁωㆁ)" data-k="呆 猫 korean 韩系颜文字"><span>(ㆁωㆁ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(•́ ᴗ •̀)" data-k="微笑 korean 韩系颜文字"><span>(•́ ᴗ •̀)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(＊ᵕᴗᵕ＊)" data-k="乖 korean 韩系颜文字"><span>(＊ᵕᴗᵕ＊)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(๑˙灬˙๑)" data-k="呆 korean 韩系颜文字"><span>(๑˙灬˙๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-26" data-c="抱抱安慰">
+      <div class="sechead">
+        <h2>抱抱安慰</h2>
+        <div class="rule"></div>
+        <span class="count">9 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(づ｡◕‿‿◕｡)づ" data-k="抱抱 hug 抱抱安慰"><span>(づ｡◕‿‿◕｡)づ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ・ω・)っ" data-k="抱 hug 抱抱安慰"><span>(っ・ω・)っ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(つ≧▽≦)つ" data-k="扑抱 hug 抱抱安慰"><span>(つ≧▽≦)つ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⊃｡•́‿•̀｡)⊃" data-k="抱 hug 抱抱安慰"><span>(⊃｡•́‿•̀｡)⊃</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ა" data-k="抱 可爱 hug 抱抱安慰"><span>૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´･ω･)っ由" data-k="递东西 give 抱抱安慰"><span>(´･ω･)っ由</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(っ ˘ω˘ς )" data-k="抱 害羞 hug 抱抱安慰"><span>(っ ˘ω˘ς )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="乁[ ◕ ᴥ ◕ ]ㄏ" data-k="张开手 熊 hug 抱抱安慰"><span>乁[ ◕ ᴥ ◕ ]ㄏ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(*´▽`)ノノ" data-k="安慰 摸 hug 抱抱安慰"><span>(*´▽`)ノノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-27" data-c="脸的零件">
+      <div class="sechead">
+        <h2>脸的零件</h2>
+        <div class="rule"></div>
+        <span class="count">98 个</span>
+      </div>
+      <div class="grid parts">
+        <div class="tile" role="button" tabindex="0" data-t="˘" data-k="眼睛 眯 零件 脸的零件"><span>˘</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᵕ" data-k="眼睛 嘴 弯 零件 脸的零件"><span>ᵕ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ω" data-k="嘴 猫嘴 零件 脸的零件"><span>ω</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="◕" data-k="眼睛 大 零件 脸的零件"><span>◕</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="‿" data-k="嘴 笑 零件 脸的零件"><span>‿</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᴗ" data-k="嘴 笑 零件 脸的零件"><span>ᴗ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˃" data-k="眼睛 挤眼 零件 脸的零件"><span>˃</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˂" data-k="眼睛 挤眼 零件 脸的零件"><span>˂</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="・" data-k="眼睛 点 零件 脸的零件"><span>・</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="｡" data-k="眼睛 小圆 零件 脸的零件"><span>｡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="๑" data-k="脸颊 装饰 零件 脸的零件"><span>๑</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˙" data-k="眼睛 点 零件 脸的零件 小点 装饰 装饰符号"><span>˙</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="°" data-k="眼睛 圈 零件 脸的零件"><span>°</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʘ" data-k="眼睛 瞪 零件 脸的零件"><span>ʘ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="◔" data-k="眼睛 斜看 零件 脸的零件"><span>◔</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᴖ" data-k="眼睛 闭 零件 脸的零件"><span>ᴖ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⌣" data-k="嘴 笑 零件 脸的零件"><span>⌣</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ε" data-k="嘴 撅 零件 脸的零件"><span>ε</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="³" data-k="嘴 亲 零件 脸的零件"><span>³</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᐛ" data-k="嘴 咧 零件 脸的零件"><span>ᐛ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="꒳" data-k="嘴 猫 零件 脸的零件"><span>꒳</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᗜ" data-k="嘴 大笑 零件 脸的零件 嘴 大笑 零件 脸的零件"><span>ᗜ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="▽" data-k="嘴 张 零件 脸的零件"><span>▽</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="﹏" data-k="嘴 波浪 哭 零件 脸的零件"><span>﹏</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="‸" data-k="嘴 撇 零件 脸的零件"><span>‸</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="෴" data-k="嘴 波浪 零件 脸的零件 波浪 装饰 装饰符号"><span>෴</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ㅅ" data-k="嘴 兔 零件 脸的零件 嘴 兔 零件 脸的零件"><span>ㅅ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᴥ" data-k="嘴 熊 零件 脸的零件"><span>ᴥ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="꒵" data-k="嘴 弯 零件 脸的零件"><span>꒵</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᗨ" data-k="嘴 笑 零件 脸的零件"><span>ᗨ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヮ" data-k="嘴 开心 零件 脸的零件 嘴 开心 零件 脸的零件"><span>ヮ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⤙" data-k="嘴 左 零件 脸的零件 嘴 零件 脸的零件"><span>⤙</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⤚" data-k="嘴 右 零件 脸的零件"><span>⤚</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(" data-k="括号 零件 脸的零件"><span>(</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t=")" data-k="括号 零件 脸的零件"><span>)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₍" data-k="括号 小 零件 脸的零件"><span>₍</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₎" data-k="括号 小 零件 脸的零件"><span>₎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⁽" data-k="括号 小 零件 脸的零件"><span>⁽</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⁾" data-k="括号 小 零件 脸的零件"><span>⁾</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʕ" data-k="括号 熊 零件 脸的零件"><span>ʕ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʔ" data-k="括号 熊 零件 脸的零件"><span>ʔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮" data-k="手 抱 零件 脸的零件"><span>૮</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ა" data-k="手 抱 零件 脸的零件"><span>ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="꒰" data-k="括号 花 零件 脸的零件"><span>꒰</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="꒱" data-k="括号 花 零件 脸的零件"><span>꒱</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩" data-k="手 举 零件 脸的零件"><span>٩</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="۶" data-k="手 举 零件 脸的零件"><span>۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ﻭ" data-k="手 加油 零件 脸的零件"><span>ﻭ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᕕ" data-k="手 跑 零件 脸的零件"><span>ᕕ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᕗ" data-k="手 跑 零件 脸的零件"><span>ᕗ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ノ" data-k="手 挥 零件 脸的零件"><span>ノ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ヽ" data-k="手 举 零件 脸的零件"><span>ヽ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="っ" data-k="手 递 零件 脸的零件"><span>っ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="づ" data-k="手 递 零件 脸的零件"><span>づ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⁄" data-k="脸红 斜线 零件 脸的零件"><span>⁄</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="〃" data-k="脸红 斜线 零件 脸的零件"><span>〃</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˶" data-k="脸颊 零件 脸的零件"><span>˶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="„" data-k="脸颊 零件 脸的零件"><span>„</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✧" data-k="闪 装饰 零件 脸的零件 星星 闪 star 装饰 装饰符号 闪 装饰 装饰符号"><span>✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="᷄" data-k="眼睛 眉 零件 脸的零件"><span>᷄</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="᷅" data-k="眼睛 眉 零件 脸的零件"><span>᷅</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="͈" data-k="脸颊 零件 脸的零件"><span>͈</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᗝ" data-k="嘴 张 零件 脸的零件"><span>ᗝ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᆺ" data-k="嘴 兔 零件 脸的零件"><span>ᆺ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ﻌ" data-k="嘴 猫 零件 脸的零件"><span>ﻌ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ڡ" data-k="嘴 舔 零件 脸的零件"><span>ڡ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="㉨" data-k="嘴 熊 零件 脸的零件"><span>㉨</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ェ" data-k="嘴 熊 零件 脸的零件"><span>ェ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="灬" data-k="胡须 零件 脸的零件"><span>灬</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᴗ̈" data-k="嘴 笑 零件 脸的零件"><span>ᴗ̈</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᵕ̈" data-k="嘴 笑 零件 脸的零件"><span>ᵕ̈</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="Δ" data-k="嘴 张 零件 脸的零件"><span>Δ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᗒ" data-k="眼睛 哭 零件 脸的零件"><span>ᗒ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᗕ" data-k="眼睛 哭 零件 脸的零件"><span>ᗕ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᗣ" data-k="嘴 哭 零件 脸的零件"><span>ᗣ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ㅂ" data-k="嘴 韩 零件 脸的零件"><span>ㅂ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ㆆ" data-k="眼睛 麻木 零件 脸的零件"><span>ㆆ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ಠ" data-k="眼睛 嫌弃 零件 脸的零件"><span>ಠ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ಥ" data-k="眼睛 哭 零件 脸的零件"><span>ಥ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⚆" data-k="眼睛 呆 零件 脸的零件"><span>⚆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ↀ" data-k="眼睛 猫 零件 脸的零件"><span>ↀ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="੭" data-k="手 递 零件 脸的零件"><span>੭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૭" data-k="手 举 零件 脸的零件"><span>૭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᐝ" data-k="小尾巴 零件 脸的零件"><span>ᐝ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ฅ" data-k="猫爪 零件 脸的零件"><span>ฅ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᶘ" data-k="身体 海豹 零件 脸的零件"><span>ᶘ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᶅ" data-k="身体 海豹 零件 脸的零件"><span>ᶅ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᵔ" data-k="眼睛 弯 零件 脸的零件"><span>ᵔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᵗ" data-k="小字 零件 脸的零件"><span>ᵗ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ˊ" data-k="眉 零件 脸的零件"><span>ˊ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ˋ" data-k="眉 零件 脸的零件"><span>ˋ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="͡" data-k="眉 零件 脸的零件"><span>͡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᐠ" data-k="括号 猫 零件 脸的零件"><span>ᐠ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᐟ" data-k="括号 猫 零件 脸的零件"><span>ᐟ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="マ" data-k="猫耳 零件 脸的零件"><span>マ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ꞈ" data-k="嘴 猫 零件 脸的零件"><span>ꞈ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⊃" data-k="手 抱 零件 脸的零件"><span>⊃</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⊂" data-k="手 抱 零件 脸的零件"><span>⊂</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-28" data-c="装饰符号">
+      <div class="sechead">
+        <h2>装饰符号</h2>
+        <div class="rule"></div>
+        <span class="count">94 个</span>
+      </div>
+      <div class="grid parts">
+        <div class="tile" role="button" tabindex="0" data-t="♡" data-k="爱心 love 装饰 装饰符号"><span>♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♥" data-k="爱心 love 装饰 装饰符号"><span>♥</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ღ" data-k="爱心 love 装饰 装饰符号"><span>ღ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❤" data-k="爱心 love 装饰 装饰符号"><span>❤</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᰔᩚ" data-k="爱心 love 装饰 装饰符号"><span>ᰔᩚ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡̶" data-k="爱心 划 love 装饰 装饰符号"><span>♡̶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="୨୧" data-k="爱心 对称 装饰 装饰符号"><span>୨୧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☆" data-k="星星 star 装饰 装饰符号"><span>☆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="★" data-k="星星 star 装饰 装饰符号"><span>★</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✦" data-k="星星 star 装饰 装饰符号 星 star 装饰 装饰符号"><span>✦</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✩" data-k="星星 star 装饰 装饰符号 星 装饰 装饰符号"><span>✩</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✫" data-k="星星 star 装饰 装饰符号"><span>✫</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⭑" data-k="星星 star 装饰 装饰符号"><span>⭑</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⋆" data-k="星星 小 star 装饰 装饰符号"><span>⋆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✿" data-k="花 flower 装饰 装饰符号 花 flower 装饰 装饰符号"><span>✿</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❀" data-k="花 flower 装饰 装饰符号 花 装饰 装饰符号"><span>❀</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❁" data-k="花 flower 装饰 装饰符号"><span>❁</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✾" data-k="花 flower 装饰 装饰符号"><span>✾</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⚘" data-k="花 草 flower 装饰 装饰符号"><span>⚘</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ꕤ" data-k="花 flower 装饰 装饰符号"><span>ꕤ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♧" data-k="草 三叶 装饰 装饰符号 草 装饰 装饰符号"><span>♧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⑅" data-k="小花 装饰 装饰符号"><span>⑅</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☾" data-k="月亮 moon 装饰 装饰符号 月亮 moon 装饰 装饰符号"><span>☾</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☽" data-k="月亮 moon 装饰 装饰符号"><span>☽</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="᭄" data-k="风 装饰 装饰符号"><span>᭄</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᨒ" data-k="水 波浪 装饰 装饰符号"><span>ᨒ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⌇" data-k="风 线 装饰 装饰符号 波浪 装饰 装饰符号"><span>⌇</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⌒" data-k="风 弧 装饰 装饰符号"><span>⌒</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="〜" data-k="波浪 装饰 装饰符号"><span>〜</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⊹" data-k="闪 装饰 装饰符号"><span>⊹</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="࿔" data-k="装饰 点 装饰符号"><span>࿔</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˚" data-k="小圈 装饰 装饰符号"><span>˚</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₊" data-k="加 装饰 装饰符号"><span>₊</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᯓ" data-k="风 冲 装饰 装饰符号"><span>ᯓ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᥫ᭡" data-k="爱心 装饰 装饰符号"><span>ᥫ᭡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ৎ" data-k="爱心 装饰 装饰符号"><span>ৎ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𓂃" data-k="线条 装饰 装饰符号 线条 装饰 装饰符号"><span>𓂃</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❥" data-k="爱心 箭 love 装饰 装饰符号 爱心 love 装饰 装饰符号"><span>❥</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⤷" data-k="箭头 装饰 装饰符号"><span>⤷</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="╰┈➤" data-k="箭头 装饰 装饰符号"><span>╰┈➤</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᰔ" data-k="爱心 love 装饰 装饰符号"><span>ᰔ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ෆ" data-k="爱心 love 装饰 装饰符号"><span>ෆ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♡̷" data-k="爱心 划 love 装饰 装饰符号"><span>♡̷</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♥︎" data-k="爱心 love 装饰 装饰符号"><span>♥︎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❦" data-k="花 love 装饰 装饰符号"><span>❦</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❧" data-k="花 装饰 装饰符号"><span>❧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ꕥ" data-k="花 flower 装饰 装饰符号"><span>ꕥ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❉" data-k="花 星 装饰 装饰符号"><span>❉</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✽" data-k="花 装饰 装饰符号"><span>✽</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✤" data-k="花 装饰 装饰符号"><span>✤</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❋" data-k="花 装饰 装饰符号"><span>❋</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⚜" data-k="花纹 装饰 装饰符号"><span>⚜</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✵" data-k="星 star 装饰 装饰符号"><span>✵</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✶" data-k="星 star 装饰 装饰符号"><span>✶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✷" data-k="星 star 装饰 装饰符号"><span>✷</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✸" data-k="星 star 装饰 装饰符号"><span>✸</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❈" data-k="星 装饰 装饰符号"><span>❈</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⋆｡°✩" data-k="星 闪 装饰 装饰符号"><span>⋆｡°✩</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˚₊·" data-k="闪 点 装饰 装饰符号"><span>˚₊·</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="݁" data-k="小点 装饰 装饰符号"><span>݁</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˖" data-k="小点 装饰 装饰符号"><span>˖</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="࣪" data-k="小点 装饰 装饰符号"><span>࣪</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⋅" data-k="小点 装饰 装饰符号"><span>⋅</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✎" data-k="笔 写 装饰 装饰符号"><span>✎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✐" data-k="笔 装饰 装饰符号"><span>✐</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⚡" data-k="闪电 装饰 装饰符号"><span>⚡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☁" data-k="云 装饰 装饰符号"><span>☁</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☂" data-k="伞 装饰 装饰符号"><span>☂</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❅" data-k="雪花 装饰 装饰符号"><span>❅</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="❆" data-k="雪花 装饰 装饰符号"><span>❆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✼" data-k="雪 花 装饰 装饰符号"><span>✼</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☘" data-k="草 装饰 装饰符号"><span>☘</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𓆉" data-k="乌龟 装饰 装饰符号"><span>𓆉</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𓅫" data-k="小鸟 装饰 装饰符号"><span>𓅫</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𓃹" data-k="小动物 装饰 装饰符号"><span>𓃹</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𓈒" data-k="小点 装饰 装饰符号"><span>𓈒</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𓏲" data-k="线条 装饰 装饰符号"><span>𓏲</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᜊ" data-k="装饰 符号 装饰符号"><span>ᜊ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᰋ" data-k="装饰 符号 装饰符号"><span>ᰋ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ꔫ" data-k="装饰 符号 装饰符号"><span>ꔫ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ଓ" data-k="装饰 符号 装饰符号"><span>ଓ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ೃ" data-k="装饰 符号 装饰符号"><span>ೃ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="࿐" data-k="装饰 尾 符号 装饰符号"><span>࿐</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ೀ" data-k="花 装饰 装饰符号"><span>ೀ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⌗" data-k="井号 装饰 装饰符号"><span>⌗</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="᯽" data-k="花 装饰 装饰符号"><span>᯽</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⭒" data-k="星 装饰 装饰符号"><span>⭒</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⋔" data-k="装饰 符号 装饰符号"><span>⋔</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♪" data-k="音符 music 装饰 装饰符号"><span>♪</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♫" data-k="音符 music 装饰 装饰符号"><span>♫</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♬" data-k="音符 music 装饰 装饰符号"><span>♬</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="♩" data-k="音符 music 装饰 装饰符号"><span>♩</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☼" data-k="太阳 sun 装饰 装饰符号"><span>☼</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☀" data-k="太阳 sun 装饰 装饰符号"><span>☀</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-29" data-c="边框分隔">
+      <div class="sechead">
+        <h2>边框分隔</h2>
+        <div class="rule"></div>
+        <span class="count">27 个</span>
+      </div>
+      <div class="grid parts">
+        <div class="tile" role="button" tabindex="0" data-t="ೀ⋆｡˚" data-k="边框 装饰 分隔 边框分隔"><span>ೀ⋆｡˚</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˚｡⋆୨୧˚" data-k="边框 爱心 分隔 边框分隔"><span>˚｡⋆୨୧˚</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₊˚ପ⋆｡˚₊" data-k="边框 分隔 边框分隔"><span>₊˚ପ⋆｡˚₊</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✧･ﾟ: *✧･ﾟ:*" data-k="边框 闪 分隔 边框分隔"><span>✧･ﾟ: *✧･ﾟ:*</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="･ﾟ✧*:･ﾟ✧" data-k="边框 闪 分隔 边框分隔"><span>･ﾟ✧*:･ﾟ✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⊹ ࣪ ˖" data-k="边框 简单 分隔 边框分隔"><span>⊹ ࣪ ˖</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☆⌒(≧▽° )" data-k="抛媚眼 wink 边框分隔"><span>☆⌒(≧▽° )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="━━━ ･ ｡ﾟ☆ ━━━" data-k="分隔线 分隔 边框分隔"><span>━━━ ･ ｡ﾟ☆ ━━━</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˗ˏˋ ✎ ˎˊ˗" data-k="标题 装饰 分隔 边框分隔"><span>˗ˏˋ ✎ ˎˊ˗</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="໒꒰ྀི ˊ࿁ˋ ꒱ྀིა" data-k="可爱 边框 边框分隔"><span>໒꒰ྀི ˊ࿁ˋ ꒱ྀིა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⋅˚₊‧ ୨୧ ‧₊˚ ⋅" data-k="边框 对称 分隔 边框分隔"><span>⋅˚₊‧ ୨୧ ‧₊˚ ⋅</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˚₊· ͟͟͞͞➳❥" data-k="箭头 爱心 分隔 边框分隔"><span>˚₊· ͟͟͞͞➳❥</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𓆝 𓆟 𓆞" data-k="小鱼 装饰 分隔 边框分隔"><span>𓆝 𓆟 𓆞</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="·˚ ༘₊· ͟͟͞͞☾" data-k="月亮 边框 分隔 边框分隔"><span>·˚ ༘₊· ͟͟͞͞☾</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✿˚₊· ͟͟͞͞ ✧" data-k="花 闪 分隔 边框分隔"><span>✿˚₊· ͟͟͞͞ ✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="☆.｡.:*·゜" data-k="星星 分隔 边框分隔"><span>☆.｡.:*·゜</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="━━━━━━━━" data-k="分隔线 分隔 边框分隔"><span>━━━━━━━━</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˚ ༘ ೀ⋆｡˚" data-k="边框 分隔 边框分隔"><span>˚ ༘ ೀ⋆｡˚</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⋆⁺₊⋆ ☾⋆⁺₊⋆" data-k="月亮 边框 分隔 边框分隔"><span>⋆⁺₊⋆ ☾⋆⁺₊⋆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="୨୧┈┈┈┈┈┈୨୧" data-k="边框 长 分隔 边框分隔"><span>୨୧┈┈┈┈┈┈୨୧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="∘₊✧──────✧₊∘" data-k="边框 长 分隔 边框分隔"><span>∘₊✧──────✧₊∘</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="╭┈┈┈┈┈╮" data-k="框 上 分隔 边框分隔"><span>╭┈┈┈┈┈╮</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="╰┈┈┈┈┈╯" data-k="框 下 分隔 边框分隔"><span>╰┈┈┈┈┈╯</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✎﹏﹏﹏﹏" data-k="写字 分隔 边框分隔"><span>✎﹏﹏﹏﹏</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="◜◝ ◜◝ ◜◝" data-k="波浪 分隔 边框分隔"><span>◜◝ ◜◝ ◜◝</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="·͙*̩̩͙˚̩̥̩̥*̩̩̥͙" data-k="闪 分隔 边框分隔"><span>·͙*̩̩͙˚̩̥̩̥*̩̩̥͙</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="꒰ঌ ໒꒱" data-k="边框 可爱 分隔 边框分隔"><span>꒰ঌ ໒꒱</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+    <p class="empty hidden" id="empty"></p>
+  </main>
+
+  <footer>
+    <p>有些符号在别人的手机上可能显示成方框 <span class="mono">□</span>，那是对方字体不支持，重要场合挑常见一点的更保险。</p>
+    <p>这些本质上都是拼装件——把 <span class="mono">( ˃ ᴗ ˂ )</span> 里的嘴换成 <span class="mono">ω</span> 或 <span class="mono">‿</span>，眉眼方向对调，就能捏出新表情。零件都在最后三栏。</p>
+  </footer>
+</div>
+
+<a class="fab" href="#menu">☰ 目录</a>
+
+<div class="menu" id="menu">
+  <div class="menu-head">
+    <h2>跳到分类</h2>
+    <a class="menu-close" href="#close">关闭</a>
+  </div>
+  <nav class="menu-grid" aria-label="全部分类">
+    <a href="#cat-0">开心<span class="n">51</span></a>
+    <a href="#cat-1">害羞<span class="n">24</span></a>
+    <a href="#cat-2">爱心撒娇<span class="n">38</span></a>
+    <a href="#cat-3">卖萌求求<span class="n">26</span></a>
+    <a href="#cat-4">难过哭泣<span class="n">28</span></a>
+    <a href="#cat-5">生气<span class="n">26</span></a>
+    <a href="#cat-6">疑惑<span class="n">12</span></a>
+    <a href="#cat-7">惊讶<span class="n">19</span></a>
+    <a href="#cat-8">无语冷漠<span class="n">25</span></a>
+    <a href="#cat-9">困了睡了<span class="n">18</span></a>
+    <a href="#cat-10">小动物<span class="n">49</span></a>
+    <a href="#cat-11">打招呼<span class="n">22</span></a>
+    <a href="#cat-12">庆祝跳舞<span class="n">13</span></a>
+    <a href="#cat-13">动作手势<span class="n">17</span></a>
+    <a href="#cat-14">期待兴奋<span class="n">12</span></a>
+    <a href="#cat-15">吃东西<span class="n">16</span></a>
+    <a href="#cat-16">累了打工<span class="n">16</span></a>
+    <a href="#cat-17">加油鼓励<span class="n">13</span></a>
+    <a href="#cat-18">谢谢道歉<span class="n">10</span></a>
+    <a href="#cat-19">尴尬心虚<span class="n">9</span></a>
+    <a href="#cat-20">得意骄傲<span class="n">12</span></a>
+    <a href="#cat-21">偷看躲藏<span class="n">9</span></a>
+    <a href="#cat-22">魔法撒花<span class="n">10</span></a>
+    <a href="#cat-23">音乐<span class="n">9</span></a>
+    <a href="#cat-24">沙雕恶搞<span class="n">17</span></a>
+    <a href="#cat-25">韩系颜文字<span class="n">12</span></a>
+    <a href="#cat-26">抱抱安慰<span class="n">9</span></a>
+    <a href="#cat-27">脸的零件<span class="n">98</span></a>
+    <a href="#cat-28">装饰符号<span class="n">94</span></a>
+    <a href="#cat-29">边框分隔<span class="n">27</span></a>
+  </nav>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    root.className += " js";
+
+    /* 增强失败时退回纯静态版本：列表本来就在 HTML 里，
+       把 .js 摘掉，搜索框收起来、说明重新露出来，页面依然能用。 */
+    try { enhance(); } catch (err) {
+      root.className = root.className.replace(/\bjs\b/, "");
+      return;
+    }
+
+    function enhance() {
+
+    var chipsBox = document.getElementById("chips");
+    var q = document.getElementById("q");
+    var toastEl = document.getElementById("toast");
+    var emptyEl = document.getElementById("empty");
+    var out = document.getElementById("out");
+
+    var sections = [].slice.call(out.querySelectorAll("section"));
+    var tiles = [].slice.call(out.querySelectorAll(".tile"));
+    var active = "全部";
+
+    /* ---------- 本地存储 ---------- */
+    var favs = load("kao.favs", []);
+    var uses = load("kao.uses", {});
+    function load(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+      catch (e) { return fallback; }
+    }
+    function save(key, val) {
+      try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+    }
+
+    /* ---------- 收藏标记 ---------- */
+    function markFav(tile) {
+      var on = favs.indexOf(tile.dataset.t) > -1;
+      var btn = tile.querySelector(".fav");
+      btn.textContent = on ? "♥" : "♡";
+      btn.setAttribute("aria-pressed", on);
+      btn.setAttribute("aria-label", on ? "取消收藏" : "收藏");
+    }
+    tiles.forEach(markFav);
+
+    /* ---------- 分类 ----------
+       分类链接已经在 HTML 里了，没有脚本时点了会跳到对应分区。脚本能跑
+       时改成就地筛选，另外补上「全部 / 收藏 / 常用」这三个。 */
+    ["常用", "收藏", "全部"].forEach(function (name) {
+      var b = document.createElement("a");
+      b.className = "chip" + (name === "全部" ? "" : " needs-js");
+      b.href = "#";
+      b.textContent = name;
+      b.setAttribute("aria-pressed", name === active);
+      chipsBox.insertBefore(b, chipsBox.firstChild);
+    });
+
+    function pick(name) {
+      active = name;
+      [].forEach.call(chipsBox.querySelectorAll(".chip"), function (c) {
+        c.setAttribute("aria-pressed", c.textContent.trim() === active);
+      });
+      apply();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    chipsBox.addEventListener("click", function (e) {
+      var chip = e.target.closest(".chip");
+      if (!chip) return;
+      e.preventDefault();
+      pick(chip.textContent.trim());
+    });
+
+    /* 全屏目录：有脚本时选完就筛选并关掉，不用再滑回顶部 */
+    document.getElementById("menu").addEventListener("click", function (e) {
+      var link = e.target.closest(".menu-grid a");
+      if (!link) return;
+      e.preventDefault();
+      q.value = "";
+      pick(link.firstChild.textContent.trim());
+      location.hash = "close";
+    });
+
+    /* ---------- 筛选 ---------- */
+    function apply() {
+      var term = q.value.trim().toLowerCase();
+      var total = 0;
+
+      sections.forEach(function (sec) {
+        var catOK = active === "全部" || active === "收藏" || active === "常用"
+          || active === sec.dataset.c;
+        var shown = 0;
+
+        [].forEach.call(sec.querySelectorAll(".tile"), function (tile) {
+          var t = tile.dataset.t;
+          var ok = catOK
+            && (!term || (t + " " + tile.dataset.k).toLowerCase().indexOf(term) > -1)
+            && (active !== "收藏" || favs.indexOf(t) > -1)
+            && (active !== "常用" || uses[t]);
+          tile.classList.toggle("hidden", !ok);
+          /* 常用栏里按次数排前后 */
+          tile.style.order = active === "常用" ? String(-(uses[t] || 0)) : "";
+          if (ok) shown++;
+        });
+
+        sec.classList.toggle("hidden", shown === 0);
+        sec.querySelector(".count").textContent = shown + " 个";
+        total += shown;
+      });
+
+      if (total === 0) {
+        emptyEl.textContent = active === "收藏"
+          ? "还没有收藏。点格子右上角的 ♡ 把喜欢的存起来。"
+          : active === "常用"
+            ? "复制过的会出现在这里，按使用次数排。"
+            : "没找到「" + q.value.trim() + "」。换个词试试，比如「哭」「猫」「星星」。";
+      }
+      emptyEl.classList.toggle("hidden", total !== 0);
+    }
+
+    /* ---------- 点击：复制 / 收藏 ---------- */
+    out.addEventListener("click", function (e) {
+      var favBtn = e.target.closest(".fav");
+      if (favBtn) {
+        e.stopPropagation();
+        var tile = favBtn.closest(".tile");
+        var text = tile.dataset.t;
+        var idx = favs.indexOf(text);
+        if (idx > -1) { favs.splice(idx, 1); } else { favs.push(text); }
+        save("kao.favs", favs);
+        tiles.forEach(function (t) { if (t.dataset.t === text) markFav(t); });
+        toast(favs.indexOf(text) > -1 ? "已收藏  " + text : "已取消收藏");
+        if (active === "收藏") apply();
+        return;
+      }
+      var hit = e.target.closest(".tile");
+      if (hit) copy(hit);
+    });
+
+    out.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      var hit = e.target.closest(".tile");
+      if (!hit || e.target.closest(".fav")) return;
+      e.preventDefault();
+      copy(hit);
+    });
+
+    function copy(tile) {
+      var text = tile.dataset.t;
+      var done = function () {
+        uses[text] = (uses[text] || 0) + 1;
+        save("kao.uses", uses);
+        toast("已复制  " + text);
+        tile.classList.add("copied");
+        setTimeout(function () { tile.classList.remove("copied"); }, 550);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallback(text, done); });
+      } else {
+        fallback(text, done);
+      }
+    }
+    function fallback(text, done) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+      if (ok) { done(); } else { toast("复制失败，长按选中试试"); }
+    }
+
+    var toastTimer;
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("on");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { toastEl.classList.remove("on"); }, 1400);
+    }
+
+    /* ---------- 搜索 ---------- */
+    var searchTimer;
+    q.oninput = function () {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(apply, 90);
+    };
+
+    /* ---------- 深浅色 ---------- */
+    var themeBtn = document.getElementById("theme");
+    var saved = null;
+    try { saved = localStorage.getItem("kao.theme"); } catch (e) {}
+    if (saved) root.setAttribute("data-theme", saved);
+    function isDark() {
+      var attr = root.getAttribute("data-theme");
+      if (attr) return attr === "dark";
+      return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    function syncThemeBtn() { themeBtn.textContent = isDark() ? "☀" : "☾"; }
+    themeBtn.onclick = function () {
+      var next = isDark() ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("kao.theme", next); } catch (e) {}
+      syncThemeBtn();
+    };
+    syncThemeBtn();
+    }
+  })();
+</script>
