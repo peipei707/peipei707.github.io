@@ -13,6 +13,8 @@
     --rose-wash: #FAE4EA;
     --on-rose:   #FFFFFF;
     --peri:      #6169B4;
+    --wash1:     #F8E0E8;
+    --wash2:     #E7E9F7;
     --shadow:    0 1px 0 rgba(58,44,49,.03), 0 10px 24px -18px rgba(58,44,49,.55);
     --r:         14px;
     --serif:     "Songti SC", "STSong", "Noto Serif SC", Georgia, "Times New Roman", serif;
@@ -27,23 +29,25 @@
       --bg:#1B161A; --card:#262029; --edge:#3B3040;
       --ink:#F1E6EA; --ink-soft:#A6939C; --rose:#F0899F; --rose-wash:#3A2530;
       --on-rose:#241D23; --peri:#A5A9E8;
+      --wash1:#33222F; --wash2:#252A45;
       --shadow: 0 1px 0 rgba(0,0,0,.2), 0 10px 24px -18px rgba(0,0,0,.9);
     }
   }
   :root[data-theme="dark"] {
     --bg:#1B161A; --card:#262029; --edge:#3B3040;
     --ink:#F1E6EA; --ink-soft:#A6939C; --rose:#F0899F; --rose-wash:#3A2530;
-    --on-rose:#241D23; --peri:#A5A9E8;
+    --on-rose:#241D23; --peri:#A5A9E8; --wash1:#33222F; --wash2:#252A45;
     --shadow: 0 1px 0 rgba(0,0,0,.2), 0 10px 24px -18px rgba(0,0,0,.9);
   }
   :root[data-theme="light"] {
     --bg:#FBF5F3; --card:#FFFFFF; --edge:#EEDCD8;
     --ink:#3A2C31; --ink-soft:#8B747B; --rose:#C9587A; --rose-wash:#FAE4EA;
-    --on-rose:#FFFFFF; --peri:#6169B4;
+    --on-rose:#FFFFFF; --peri:#6169B4; --wash1:#F8E0E8; --wash2:#E7E9F7;
     --shadow: 0 1px 0 rgba(58,44,49,.03), 0 10px 24px -18px rgba(58,44,49,.55);
   }
 
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     margin: 0;
     background: var(--bg);
@@ -51,6 +55,12 @@
     font-family: var(--sans);
     line-height: 1.6;
     -webkit-text-size-adjust: 100%;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(560px 420px at 88% -4%, var(--wash1), transparent 65%),
+      radial-gradient(520px 420px at -8% 26%, var(--wash2), transparent 65%);
   }
   .wrap { max-width: 1040px; margin: 0 auto; padding: 0 18px 96px; }
 
@@ -69,8 +79,19 @@
     font-weight: 600; letter-spacing: .02em; margin: 0;
     text-wrap: balance;
   }
-  h1 .deco { color: var(--rose); font-family: var(--kao); }
+  h1 .deco {
+    color: var(--rose); font-family: var(--kao);
+    display: inline-block; animation: bob 3.2s ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
   .sub { margin: 0; color: var(--ink-soft); max-width: 58ch; font-size: 15px; }
+  .hero-line {
+    font-family: var(--kao); color: var(--rose);
+    font-size: 15px; letter-spacing: .08em;
+  }
 
   /* ---------- 脚本跑不起来时的说明 ----------
      一切默认可见，脚本能跑时才把这些收起来。有些手机上的文件预览器会把
@@ -103,8 +124,8 @@
     appearance: none;
   }
   input[type="search"]::placeholder { color: var(--ink-soft); }
-  input[type="search"]:focus-visible,
-  button:focus-visible, .tile:focus-visible {
+  input:focus-visible, button:focus-visible,
+  a:focus-visible, .tile:focus-visible {
     outline: 2px solid var(--peri); outline-offset: 2px;
   }
   .iconbtn {
@@ -116,6 +137,10 @@
   .chips {
     display: flex; gap: 6px; overflow-x: auto; padding: 10px 0;
     scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right,
+      transparent, #000 14px, #000 calc(100% - 14px), transparent);
+    mask-image: linear-gradient(to right,
+      transparent, #000 14px, #000 calc(100% - 14px), transparent);
   }
   .chips::-webkit-scrollbar { display: none; }
   .chip {
@@ -146,6 +171,11 @@
     font-family: var(--serif); font-size: 19px; font-weight: 600;
     margin: 0; letter-spacing: .04em;
   }
+  .sechead h2::before, .menu-head h2::before {
+    content: "୨୧"; color: var(--rose);
+    font-family: var(--kao); font-size: .7em;
+    margin-right: 9px; vertical-align: 2px;
+  }
   .count {
     font-size: 12px; color: var(--ink-soft);
     font-variant-numeric: tabular-nums;
@@ -160,7 +190,7 @@
 
   .tile {
     position: relative;
-    font-family: var(--kao); font-size: 16px; line-height: 1.35;
+    font-family: var(--kao); font-size: 17px; line-height: 1.35;
     color: var(--ink);
     background: var(--card); border: 1px solid var(--edge);
     border-radius: var(--r); box-shadow: var(--shadow);
@@ -172,9 +202,28 @@
   }
   .grid.parts .tile { font-size: 19px; padding: 12px 6px; min-height: 48px; }
   .js .tile { cursor: pointer; }
-  .js .tile:hover { transform: translateY(-2px); border-color: var(--rose); }
+  .js .tile:hover {
+    transform: translateY(-2px); border-color: var(--rose);
+    box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--rose) 50%, transparent);
+  }
   .js .tile:active { transform: translateY(0) scale(.97); }
   .tile.copied { background: var(--rose-wash); border-color: var(--rose); }
+
+  /* 复制时的小烟花 */
+  .burst {
+    position: absolute; inset: 0;
+    display: grid; place-items: center; pointer-events: none;
+  }
+  .burst span {
+    position: absolute; font-family: var(--kao);
+    font-size: 13px; color: var(--rose);
+    animation: fly .6s ease-out forwards;
+  }
+  .burst span:nth-child(2n) { color: var(--peri); font-size: 11px; }
+  @keyframes fly {
+    from { transform: translate(0, 0) scale(.5); opacity: 1; }
+    to { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; }
+  }
   .fav {
     position: absolute; top: 3px; right: 5px;
     font-size: 12px; color: var(--edge); font-family: var(--kao);
@@ -189,17 +238,86 @@
 
   /* ---------- 目录按钮 + 全屏目录 ----------
      用 :target 开合，没有脚本也能用。 */
-  .fab {
+  .fabs {
     position: fixed; z-index: 40;
     right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+    transition: transform .2s ease;
+  }
+  body.composing .fabs { transform: translateY(-74px); }
+  .fab {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 11px 18px; border-radius: 999px;
-    background: var(--rose); color: var(--on-rose);
-    font-size: 14px; font-weight: 600; letter-spacing: .06em;
+    padding: 11px 18px; border-radius: 999px; border: 0;
+    background: linear-gradient(135deg, var(--rose),
+      color-mix(in srgb, var(--rose) 72%, var(--peri)));
+    color: var(--on-rose); cursor: pointer;
+    font: inherit; font-size: 14px; font-weight: 600; letter-spacing: .06em;
     text-decoration: none;
     box-shadow: 0 6px 20px -6px rgba(0,0,0,.45);
   }
   .fab:active { transform: scale(.96); }
+  .fab-alt {
+    background: var(--card); color: var(--ink);
+    border: 1px solid var(--edge);
+  }
+  .fab-alt[aria-pressed="true"] { border-color: var(--rose); color: var(--rose); }
+  .fab.needs-js { display: none; }
+  .js .fab.needs-js { display: inline-flex; }
+
+  /* ---------- 拼装台 ---------- */
+  .composer {
+    position: fixed; z-index: 45;
+    left: 50%; bottom: calc(14px + env(safe-area-inset-bottom));
+    transform: translate(-50%, 16px);
+    width: min(640px, calc(100vw - 24px));
+    display: none; gap: 8px; align-items: center;
+    padding: 10px; border-radius: 18px;
+    background: var(--card); border: 1px solid var(--edge);
+    box-shadow: 0 12px 32px -12px rgba(0,0,0,.4);
+    opacity: 0; pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .js .composer { display: flex; }
+  .composer.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  .composer input {
+    flex: 1; min-width: 0;
+    font-family: var(--kao); font-size: 16px;
+    color: var(--ink); background: var(--bg);
+    border: 1px solid var(--edge); border-radius: 12px; padding: 9px 12px;
+  }
+  .cbtn {
+    font: inherit; font-size: 14px; cursor: pointer; flex: none;
+    padding: 8px 14px; border-radius: 999px;
+    border: 1px solid var(--edge); background: var(--card); color: var(--ink);
+  }
+  .cbtn.main {
+    background: var(--rose); border-color: var(--rose);
+    color: var(--on-rose); font-weight: 600;
+  }
+  body.composing .toast { bottom: calc(88px + env(safe-area-inset-bottom)); }
+
+  /* ---------- 随机抽一个 ---------- */
+  .reveal {
+    position: fixed; inset: 0; z-index: 70;
+    display: none; place-items: center; padding: 20px;
+    background: color-mix(in srgb, var(--ink) 18%, transparent);
+    backdrop-filter: blur(10px);
+  }
+  .reveal.on { display: grid; }
+  .reveal-card {
+    background: var(--card); border: 1px solid var(--edge);
+    border-radius: 22px; box-shadow: var(--shadow);
+    padding: 30px 26px; text-align: center;
+    width: min(420px, 100%);
+    display: flex; flex-direction: column; gap: 12px; align-items: center;
+  }
+  .reveal-cat { font-size: 12px; letter-spacing: .18em; color: var(--ink-soft); }
+  .reveal-face {
+    font-family: var(--kao); font-size: clamp(22px, 7vw, 32px);
+    color: var(--ink); line-height: 1.4; word-break: break-word;
+  }
+  .reveal-note { font-size: 13px; color: var(--rose); min-height: 18px; }
+  .reveal-btns { display: flex; gap: 8px; }
 
   .menu { display: none; }
   .menu:target {
@@ -257,15 +375,18 @@
   footer .mono { font-family: var(--kao); color: var(--rose); }
 
   @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
+    * { transition: none !important; animation: none !important; }
+    html { scroll-behavior: auto; }
+    .burst { display: none; }
   }
 </style>
 
 <div class="wrap">
   <header class="hero">
-    <div class="kicker">Kaomoji &amp; 可爱符号库 · 741 个</div>
+    <div class="kicker">Kaomoji &amp; 可爱符号库 · 824 个</div>
     <h1>颜文字小铺 <span class="deco">૮₍ ˶•⤙•˶ ₎ა</span></h1>
     <p class="sub">点一下就复制，直接粘到聊天框里。收藏用右上角的 ♡，复制过的会记在「常用」栏。</p>
+    <div class="hero-line" aria-hidden="true">˗ˋˏᰔᩚˎˊ˗</div>
     <p class="nojs">
       <b>现在是预览模式</b>，这个打开方式关掉了网页脚本，所以点击复制和搜索用不了。
       表情全都在下面，点分类可以跳过去，<b>长按选中就能复制</b>。想要点一下就复制的话，
@@ -275,45 +396,110 @@
 
   <div class="sticky" id="controls">
     <div class="searchrow">
-      <input type="search" id="q" placeholder="搜一下：开心 / 哭 / 猫 / 星星 / 抱抱…" autocomplete="off" />
+      <input type="search" id="q" placeholder="搜一下：软萌 / 哭 / 猫 / 星星 / 抱抱…" autocomplete="off" />
+      <button class="iconbtn" id="lucky" title="随机来一个" aria-label="随机来一个">✦</button>
       <button class="iconbtn" id="theme" title="切换深浅色" aria-label="切换深浅色">☾</button>
     </div>
     <nav class="chips" id="chips" aria-label="分类">
-      <a class="chip" href="#cat-0">开心</a>
-      <a class="chip" href="#cat-1">害羞</a>
-      <a class="chip" href="#cat-2">爱心撒娇</a>
-      <a class="chip" href="#cat-3">卖萌求求</a>
-      <a class="chip" href="#cat-4">难过哭泣</a>
-      <a class="chip" href="#cat-5">生气</a>
-      <a class="chip" href="#cat-6">疑惑</a>
-      <a class="chip" href="#cat-7">惊讶</a>
-      <a class="chip" href="#cat-8">无语冷漠</a>
-      <a class="chip" href="#cat-9">困了睡了</a>
-      <a class="chip" href="#cat-10">小动物</a>
-      <a class="chip" href="#cat-11">打招呼</a>
-      <a class="chip" href="#cat-12">庆祝跳舞</a>
-      <a class="chip" href="#cat-13">动作手势</a>
-      <a class="chip" href="#cat-14">期待兴奋</a>
-      <a class="chip" href="#cat-15">吃东西</a>
-      <a class="chip" href="#cat-16">累了打工</a>
-      <a class="chip" href="#cat-17">加油鼓励</a>
-      <a class="chip" href="#cat-18">谢谢道歉</a>
-      <a class="chip" href="#cat-19">尴尬心虚</a>
-      <a class="chip" href="#cat-20">得意骄傲</a>
-      <a class="chip" href="#cat-21">偷看躲藏</a>
-      <a class="chip" href="#cat-22">魔法撒花</a>
-      <a class="chip" href="#cat-23">音乐</a>
-      <a class="chip" href="#cat-24">沙雕恶搞</a>
-      <a class="chip" href="#cat-25">韩系颜文字</a>
-      <a class="chip" href="#cat-26">抱抱安慰</a>
-      <a class="chip" href="#cat-27">脸的零件</a>
-      <a class="chip" href="#cat-28">装饰符号</a>
-      <a class="chip" href="#cat-29">边框分隔</a>
+      <a class="chip" href="#cat-0">软萌风</a>
+      <a class="chip" href="#cat-1">开心</a>
+      <a class="chip" href="#cat-2">害羞</a>
+      <a class="chip" href="#cat-3">爱心撒娇</a>
+      <a class="chip" href="#cat-4">卖萌求求</a>
+      <a class="chip" href="#cat-5">难过哭泣</a>
+      <a class="chip" href="#cat-6">生气</a>
+      <a class="chip" href="#cat-7">疑惑</a>
+      <a class="chip" href="#cat-8">惊讶</a>
+      <a class="chip" href="#cat-9">无语冷漠</a>
+      <a class="chip" href="#cat-10">困了睡了</a>
+      <a class="chip" href="#cat-11">小动物</a>
+      <a class="chip" href="#cat-12">打招呼</a>
+      <a class="chip" href="#cat-13">庆祝跳舞</a>
+      <a class="chip" href="#cat-14">动作手势</a>
+      <a class="chip" href="#cat-15">期待兴奋</a>
+      <a class="chip" href="#cat-16">吃东西</a>
+      <a class="chip" href="#cat-17">累了打工</a>
+      <a class="chip" href="#cat-18">加油鼓励</a>
+      <a class="chip" href="#cat-19">谢谢道歉</a>
+      <a class="chip" href="#cat-20">尴尬心虚</a>
+      <a class="chip" href="#cat-21">得意骄傲</a>
+      <a class="chip" href="#cat-22">偷看躲藏</a>
+      <a class="chip" href="#cat-23">魔法撒花</a>
+      <a class="chip" href="#cat-24">音乐</a>
+      <a class="chip" href="#cat-25">沙雕恶搞</a>
+      <a class="chip" href="#cat-26">韩系颜文字</a>
+      <a class="chip" href="#cat-27">抱抱安慰</a>
+      <a class="chip" href="#cat-28">脸的零件</a>
+      <a class="chip" href="#cat-29">装饰符号</a>
+      <a class="chip" href="#cat-30">边框分隔</a>
     </nav>
   </div>
 
   <main id="out">
-    <section id="cat-0" data-c="开心">
+    <section id="cat-0" data-c="软萌风">
+      <div class="sechead">
+        <h2>软萌风</h2>
+        <div class="rule"></div>
+        <span class="count">53 个</span>
+      </div>
+      <div class="grid">
+        <div class="tile" role="button" tabindex="0" data-t="(•᷄ࡇ•᷅)" data-k="软萌 委屈 无奈 soft 软萌风"><span>(•᷄ࡇ•᷅)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="•᷄ࡇ•᷅" data-k="软萌 委屈 soft 软萌风"><span>•᷄ࡇ•᷅</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(˶‾᷄ࡇ‾᷅˵)" data-k="软萌 叹气 无奈 soft 软萌风"><span>(˶‾᷄ࡇ‾᷅˵)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(‾᷄ࡇ‾᷅)" data-k="软萌 叹气 soft 软萌风"><span>(‾᷄ࡇ‾᷅)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(¯ࡇ¯)" data-k="软萌 面无表情 呆 soft 软萌风"><span>(¯ࡇ¯)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(ᖛ ̫ ᖛ)" data-k="软萌 眯眼 呆 soft 软萌风"><span>(ᖛ ̫ ᖛ)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᖛ ̫ ᖛ" data-k="软萌 眯眼 soft 软萌风"><span>ᖛ ̫ ᖛ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ๑ ̫ ๑)" data-k="软萌 呆 soft 软萌风"><span>( ๑ ̫ ๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(•̫•)" data-k="软萌 呆 soft 软萌风"><span>(•̫•)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(˶‾᷄ ⁻̫ ‾᷅˵)" data-k="软萌 无奈 soft 软萌风"><span>(˶‾᷄ ⁻̫ ‾᷅˵)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⸜(˙꒳˙)⸝" data-k="软萌 举手 开心 soft 软萌风"><span>⸜(˙꒳˙)⸝</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✩°｡⋆⸜(˙꒳˙ )⸝" data-k="软萌 撒花 庆祝 soft 软萌风"><span>✩°｡⋆⸜(˙꒳˙ )⸝</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(˶˃ ᵕ ˂˶)" data-k="软萌 开心 害羞 soft 软萌风"><span>(˶˃ ᵕ ˂˶)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(˶ᵔ ᵕ ᵔ˶)" data-k="软萌 微笑 soft 软萌风"><span>(˶ᵔ ᵕ ᵔ˶)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˶ˆ꒳ˆ˵ )" data-k="软萌 开心 soft 软萌风"><span>( ˶ˆ꒳ˆ˵ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ｡ᵘ ᵕ ᵘ ｡)" data-k="软萌 乖 soft 软萌风"><span>( ｡ᵘ ᵕ ᵘ ｡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⸜(｡˃ ᵕ ˂ )⸝♡" data-k="软萌 喜欢 爱心 soft love 软萌风"><span>⸜(｡˃ ᵕ ˂ )⸝♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⸜( ˃ ᵕ ˂ )⸝" data-k="软萌 开心 soft 软萌风"><span>⸜( ˃ ᵕ ˂ )⸝</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(⸝⸝ᵕᴗᵕ⸝⸝)" data-k="软萌 害羞 乖 soft 软萌风"><span>(⸝⸝ᵕᴗᵕ⸝⸝)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ⸝⸝´꒳`⸝⸝)" data-k="软萌 害羞 soft 软萌风"><span>( ⸝⸝´꒳`⸝⸝)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(˵ •̀ ᴗ - ˵ ) ✧" data-k="软萌 眨眼 自信 wink soft 软萌风"><span>(˵ •̀ ᴗ - ˵ ) ✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ദ്ദി( ˃ ᴗ ˂ )" data-k="软萌 比耶 开心 soft 软萌风"><span>ദ്ദി( ˃ ᴗ ˂ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ദ്ദി ˉ͈̀꒳ˉ͈́ )✧" data-k="软萌 自信 加油 soft 软萌风"><span>ദ്ദി ˉ͈̀꒳ˉ͈́ )✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="৻( •̀ ᗜ •́ ৻)" data-k="软萌 得意 冲 soft 软萌风"><span>৻( •̀ ᗜ •́ ৻)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(^ᗜ^ )و" data-k="软萌 加油 开心 soft 软萌风"><span>٩(^ᗜ^ )و</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ¯꒳¯ )ᐝ" data-k="软萌 哼 傲娇 soft 软萌风"><span>( ¯꒳¯ )ᐝ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˶°ㅁ°) !!" data-k="软萌 惊讶 wow soft 软萌风"><span>( ˶°ㅁ°) !!</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𖦹 ﹏ 𖦹" data-k="软萌 晕 头晕 soft 软萌风"><span>𖦹 ﹏ 𖦹</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ⩌⩊⩌)" data-k="软萌 呆 眯眼 soft 软萌风"><span>( ⩌⩊⩌)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𐔌 . ⩌ . 𐦯" data-k="软萌 呆 soft 软萌风"><span>𐔌 . ⩌ . 𐦯</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(₋ᴗ₋ )" data-k="软萌 困 sleep soft 软萌风"><span>(₋ᴗ₋ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᶻ 𝗓 𐰁" data-k="软萌 睡觉 zzz sleep soft 软萌风"><span>ᶻ 𝗓 𐰁</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ᵕ̩̩‸ᵕ̩̩ )" data-k="软萌 想哭 委屈 sad soft 软萌风"><span>( ᵕ̩̩‸ᵕ̩̩ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(˚ ˃̣̣̥⌓˂̣̣̥ )" data-k="软萌 哭 sad soft 软萌风"><span>(˚ ˃̣̣̥⌓˂̣̣̥ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ˃̣̣̥᷄⌓˂̣̣̥᷅ )" data-k="软萌 委屈 哭 sad soft 软萌风"><span>( ˃̣̣̥᷄⌓˂̣̣̥᷅ )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(´ᯅ`)" data-k="软萌 难过 sad soft 软萌风"><span>(´ᯅ`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(˃̣̣̥ᯅ˂̣̣̥)" data-k="软萌 大哭 sad soft 软萌风"><span>(˃̣̣̥ᯅ˂̣̣̥)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(˶˃⤙˂˵)" data-k="软萌 忍住 纠结 soft 软萌风"><span>(˶˃⤙˂˵)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="( ｡ •̀ ᴖ •́ ｡)" data-k="软萌 生气 嘟嘴 angry soft 软萌风 求求 认真 plz 卖萌求求"><span>( ｡ •̀ ᴖ •́ ｡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="٩(๑`^´๑)۶" data-k="软萌 生气 angry soft 软萌风"><span>٩(๑`^´๑)۶</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="(¬`‸´¬)" data-k="软萌 不满 哼 angry soft 软萌风"><span>(¬`‸´¬)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₍ᐢ..ᐢ₎" data-k="软萌 兔 rabbit soft 软萌风"><span>₍ᐢ..ᐢ₎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₍ᐢ. ̫.ᐢ₎" data-k="软萌 兔 rabbit soft 软萌风"><span>₍ᐢ. ̫.ᐢ₎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="꒰ᐢ. .ᐢ꒱" data-k="软萌 兔 rabbit soft 软萌风"><span>꒰ᐢ. .ᐢ꒱</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₍ᐢ⸝⸝› ‹⸝⸝ᐢ₎" data-k="软萌 兔 害羞 rabbit soft 软萌风"><span>₍ᐢ⸝⸝› ‹⸝⸝ᐢ₎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₍ᐢ›̥̥̥ ˕ ‹̥̥̥ᐢ₎" data-k="软萌 兔 想哭 rabbit sad soft 软萌风"><span>₍ᐢ›̥̥̥ ˕ ‹̥̥̥ᐢ₎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₍ᐢ˵• ₃ •˵ᐢ₎" data-k="软萌 兔 亲亲 rabbit kiss soft 软萌风"><span>₍ᐢ˵• ₃ •˵ᐢ₎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="₍ᐢ•ﻌ•ᐢ₎" data-k="软萌 兔 狗 rabbit soft 软萌风"><span>₍ᐢ•ﻌ•ᐢ₎</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="꒰ᐢ⸝⸝•༝•⸝⸝ᐢ꒱" data-k="软萌 兔 rabbit soft 软萌风"><span>꒰ᐢ⸝⸝•༝•⸝⸝ᐢ꒱</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="૮₍ ˃̵͈᷄ ᴗ ˂̵͈᷅ ₎ა" data-k="软萌 委屈 抱 soft 软萌风"><span>૮₍ ˃̵͈᷄ ᴗ ˂̵͈᷅ ₎ა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="໒꒰ྀི´ ˘ ` ꒱ྀིა" data-k="软萌 满足 soft 软萌风"><span>໒꒰ྀི´ ˘ ` ꒱ྀིა</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="꒰ྀི ∩´ ᵕ `∩꒱ྀི" data-k="软萌 兔 耳朵 rabbit soft 软萌风"><span>꒰ྀི ∩´ ᵕ `∩꒱ྀི</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⸂⸂⸜(രᴗര )⸝⸃⸃" data-k="软萌 跳舞 得意 dance soft 软萌风"><span>⸂⸂⸜(രᴗര )⸝⸃⸃</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+      </div>
+    </section>
+
+    <section id="cat-1" data-c="开心">
       <div class="sechead">
         <h2>开心</h2>
         <div class="rule"></div>
@@ -374,7 +560,7 @@
       </div>
     </section>
 
-    <section id="cat-1" data-c="害羞">
+    <section id="cat-2" data-c="害羞">
       <div class="sechead">
         <h2>害羞</h2>
         <div class="rule"></div>
@@ -408,7 +594,7 @@
       </div>
     </section>
 
-    <section id="cat-2" data-c="爱心撒娇">
+    <section id="cat-3" data-c="爱心撒娇">
       <div class="sechead">
         <h2>爱心撒娇</h2>
         <div class="rule"></div>
@@ -456,11 +642,11 @@
       </div>
     </section>
 
-    <section id="cat-3" data-c="卖萌求求">
+    <section id="cat-4" data-c="卖萌求求">
       <div class="sechead">
         <h2>卖萌求求</h2>
         <div class="rule"></div>
-        <span class="count">26 个</span>
+        <span class="count">25 个</span>
       </div>
       <div class="grid">
         <div class="tile" role="button" tabindex="0" data-t="(´•ω•̥`)" data-k="求求 委屈 plz 卖萌求求"><span>(´•ω•̥`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
@@ -470,7 +656,6 @@
         <div class="tile" role="button" tabindex="0" data-t="(๑•́ ₃ •̀๑)" data-k="撅嘴 撒娇 plz 卖萌求求"><span>(๑•́ ₃ •̀๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="(＞人＜;)" data-k="拜托 求 plz 卖萌求求"><span>(＞人＜;)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="(人･㉨･)" data-k="拜托 熊 plz 卖萌求求"><span>(人･㉨･)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
-        <div class="tile" role="button" tabindex="0" data-t="( ｡ •̀ ᴖ •́ ｡)" data-k="求求 认真 plz 卖萌求求"><span>( ｡ •̀ ᴖ •́ ｡)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="(´｡•̥̥̥ ᵕ •̥̥̥｡`)" data-k="可怜 求 plz 卖萌求求"><span>(´｡•̥̥̥ ᵕ •̥̥̥｡`)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="(◞‸◟)" data-k="失落 委屈 plz 卖萌求求"><span>(◞‸◟)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="(๑•́ ‧̫ •̀๑)" data-k="委屈 卖萌 plz 卖萌求求"><span>(๑•́ ‧̫ •̀๑)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
@@ -492,7 +677,7 @@
       </div>
     </section>
 
-    <section id="cat-4" data-c="难过哭泣">
+    <section id="cat-5" data-c="难过哭泣">
       <div class="sechead">
         <h2>难过哭泣</h2>
         <div class="rule"></div>
@@ -530,7 +715,7 @@
       </div>
     </section>
 
-    <section id="cat-5" data-c="生气">
+    <section id="cat-6" data-c="生气">
       <div class="sechead">
         <h2>生气</h2>
         <div class="rule"></div>
@@ -566,7 +751,7 @@
       </div>
     </section>
 
-    <section id="cat-6" data-c="疑惑">
+    <section id="cat-7" data-c="疑惑">
       <div class="sechead">
         <h2>疑惑</h2>
         <div class="rule"></div>
@@ -588,7 +773,7 @@
       </div>
     </section>
 
-    <section id="cat-7" data-c="惊讶">
+    <section id="cat-8" data-c="惊讶">
       <div class="sechead">
         <h2>惊讶</h2>
         <div class="rule"></div>
@@ -617,11 +802,11 @@
       </div>
     </section>
 
-    <section id="cat-8" data-c="无语冷漠">
+    <section id="cat-9" data-c="无语冷漠">
       <div class="sechead">
         <h2>无语冷漠</h2>
         <div class="rule"></div>
-        <span class="count">25 个</span>
+        <span class="count">26 个</span>
       </div>
       <div class="grid">
         <div class="tile" role="button" tabindex="0" data-t="(－_－)" data-k="无语 无奈 meh 无语冷漠"><span>(－_－)</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
@@ -649,10 +834,11 @@
         <div class="tile" role="button" tabindex="0" data-t="╮(╯_╰)╭" data-k="摊手 无所谓 shrug 无语冷漠"><span>╮(╯_╰)╭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="╮(￣▽￣)╭" data-k="摊手 随便 shrug 无语冷漠"><span>╮(￣▽￣)╭</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="(-, - )" data-k="困 无语 meh 无语冷漠"><span>(-, - )</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="乁( •_• )ㄏ" data-k="摊手 无语 shrug 无语冷漠"><span>乁( •_• )ㄏ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
       </div>
     </section>
 
-    <section id="cat-9" data-c="困了睡了">
+    <section id="cat-10" data-c="困了睡了">
       <div class="sechead">
         <h2>困了睡了</h2>
         <div class="rule"></div>
@@ -680,7 +866,7 @@
       </div>
     </section>
 
-    <section id="cat-10" data-c="小动物">
+    <section id="cat-11" data-c="小动物">
       <div class="sechead">
         <h2>小动物</h2>
         <div class="rule"></div>
@@ -739,7 +925,7 @@
       </div>
     </section>
 
-    <section id="cat-11" data-c="打招呼">
+    <section id="cat-12" data-c="打招呼">
       <div class="sechead">
         <h2>打招呼</h2>
         <div class="rule"></div>
@@ -771,7 +957,7 @@
       </div>
     </section>
 
-    <section id="cat-12" data-c="庆祝跳舞">
+    <section id="cat-13" data-c="庆祝跳舞">
       <div class="sechead">
         <h2>庆祝跳舞</h2>
         <div class="rule"></div>
@@ -794,7 +980,7 @@
       </div>
     </section>
 
-    <section id="cat-13" data-c="动作手势">
+    <section id="cat-14" data-c="动作手势">
       <div class="sechead">
         <h2>动作手势</h2>
         <div class="rule"></div>
@@ -821,7 +1007,7 @@
       </div>
     </section>
 
-    <section id="cat-14" data-c="期待兴奋">
+    <section id="cat-15" data-c="期待兴奋">
       <div class="sechead">
         <h2>期待兴奋</h2>
         <div class="rule"></div>
@@ -843,7 +1029,7 @@
       </div>
     </section>
 
-    <section id="cat-15" data-c="吃东西">
+    <section id="cat-16" data-c="吃东西">
       <div class="sechead">
         <h2>吃东西</h2>
         <div class="rule"></div>
@@ -869,7 +1055,7 @@
       </div>
     </section>
 
-    <section id="cat-16" data-c="累了打工">
+    <section id="cat-17" data-c="累了打工">
       <div class="sechead">
         <h2>累了打工</h2>
         <div class="rule"></div>
@@ -895,7 +1081,7 @@
       </div>
     </section>
 
-    <section id="cat-17" data-c="加油鼓励">
+    <section id="cat-18" data-c="加油鼓励">
       <div class="sechead">
         <h2>加油鼓励</h2>
         <div class="rule"></div>
@@ -918,7 +1104,7 @@
       </div>
     </section>
 
-    <section id="cat-18" data-c="谢谢道歉">
+    <section id="cat-19" data-c="谢谢道歉">
       <div class="sechead">
         <h2>谢谢道歉</h2>
         <div class="rule"></div>
@@ -938,7 +1124,7 @@
       </div>
     </section>
 
-    <section id="cat-19" data-c="尴尬心虚">
+    <section id="cat-20" data-c="尴尬心虚">
       <div class="sechead">
         <h2>尴尬心虚</h2>
         <div class="rule"></div>
@@ -957,7 +1143,7 @@
       </div>
     </section>
 
-    <section id="cat-20" data-c="得意骄傲">
+    <section id="cat-21" data-c="得意骄傲">
       <div class="sechead">
         <h2>得意骄傲</h2>
         <div class="rule"></div>
@@ -979,7 +1165,7 @@
       </div>
     </section>
 
-    <section id="cat-21" data-c="偷看躲藏">
+    <section id="cat-22" data-c="偷看躲藏">
       <div class="sechead">
         <h2>偷看躲藏</h2>
         <div class="rule"></div>
@@ -998,7 +1184,7 @@
       </div>
     </section>
 
-    <section id="cat-22" data-c="魔法撒花">
+    <section id="cat-23" data-c="魔法撒花">
       <div class="sechead">
         <h2>魔法撒花</h2>
         <div class="rule"></div>
@@ -1018,7 +1204,7 @@
       </div>
     </section>
 
-    <section id="cat-23" data-c="音乐">
+    <section id="cat-24" data-c="音乐">
       <div class="sechead">
         <h2>音乐</h2>
         <div class="rule"></div>
@@ -1037,7 +1223,7 @@
       </div>
     </section>
 
-    <section id="cat-24" data-c="沙雕恶搞">
+    <section id="cat-25" data-c="沙雕恶搞">
       <div class="sechead">
         <h2>沙雕恶搞</h2>
         <div class="rule"></div>
@@ -1064,7 +1250,7 @@
       </div>
     </section>
 
-    <section id="cat-25" data-c="韩系颜文字">
+    <section id="cat-26" data-c="韩系颜文字">
       <div class="sechead">
         <h2>韩系颜文字</h2>
         <div class="rule"></div>
@@ -1086,7 +1272,7 @@
       </div>
     </section>
 
-    <section id="cat-26" data-c="抱抱安慰">
+    <section id="cat-27" data-c="抱抱安慰">
       <div class="sechead">
         <h2>抱抱安慰</h2>
         <div class="rule"></div>
@@ -1105,11 +1291,11 @@
       </div>
     </section>
 
-    <section id="cat-27" data-c="脸的零件">
+    <section id="cat-28" data-c="脸的零件">
       <div class="sechead">
         <h2>脸的零件</h2>
         <div class="rule"></div>
-        <span class="count">98 个</span>
+        <span class="count">114 个</span>
       </div>
       <div class="grid parts">
         <div class="tile" role="button" tabindex="0" data-t="˘" data-k="眼睛 眯 零件 脸的零件"><span>˘</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
@@ -1210,14 +1396,30 @@
         <div class="tile" role="button" tabindex="0" data-t="ꞈ" data-k="嘴 猫 零件 脸的零件"><span>ꞈ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="⊃" data-k="手 抱 零件 脸的零件"><span>⊃</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="⊂" data-k="手 抱 零件 脸的零件"><span>⊂</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ࡇ" data-k="嘴 软萌 波浪 零件 脸的零件"><span>ࡇ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᯅ" data-k="嘴 难过 零件 脸的零件"><span>ᯅ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⌓" data-k="嘴 委屈 零件 脸的零件"><span>⌓</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⩊" data-k="嘴 微笑 零件 脸的零件"><span>⩊</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⩌" data-k="眼睛 眯 零件 脸的零件"><span>⩌</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᖛ" data-k="眼睛 眯 零件 脸的零件"><span>ᖛ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ᐢ" data-k="耳朵 兔 零件 脸的零件"><span>ᐢ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˕" data-k="鼻子 小 零件 脸的零件"><span>˕</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⸝⸝" data-k="脸颊 腮红 零件 脸的零件"><span>⸝⸝</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⸜" data-k="手 举 零件 脸的零件"><span>⸜</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⸝" data-k="手 举 零件 脸的零件"><span>⸝</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="৻" data-k="手 零件 脸的零件"><span>৻</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ദ്ദി" data-k="手 比耶 零件 脸的零件"><span>ദ്ദി</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𐔌" data-k="括号 零件 脸的零件"><span>𐔌</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𐦯" data-k="括号 零件 脸的零件"><span>𐦯</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𖦹" data-k="眼睛 晕 圈 零件 脸的零件"><span>𖦹</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
       </div>
     </section>
 
-    <section id="cat-28" data-c="装饰符号">
+    <section id="cat-29" data-c="装饰符号">
       <div class="sechead">
         <h2>装饰符号</h2>
         <div class="rule"></div>
-        <span class="count">94 个</span>
+        <span class="count">102 个</span>
       </div>
       <div class="grid parts">
         <div class="tile" role="button" tabindex="0" data-t="♡" data-k="爱心 love 装饰 装饰符号"><span>♡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
@@ -1314,14 +1516,22 @@
         <div class="tile" role="button" tabindex="0" data-t="♩" data-k="音符 music 装饰 装饰符号"><span>♩</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="☼" data-k="太阳 sun 装饰 装饰符号"><span>☼</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="☀" data-k="太阳 sun 装饰 装饰符号"><span>☀</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˗ˋˏᰔᩚˎˊ˗" data-k="爱心 标题 手写 love 装饰 装饰符号"><span>˗ˋˏᰔᩚˎˊ˗</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˗ˏˋ ♡ ˎˊ˗" data-k="爱心 标题 love 装饰 装饰符号"><span>˗ˏˋ ♡ ˎˊ˗</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="ʚɞ" data-k="蝴蝶结 爱心 love 装饰 装饰符号"><span>ʚɞ</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="𝜗𝜚" data-k="蝴蝶结 爱心 love 装饰 装饰符号"><span>𝜗𝜚</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="๋࣭ ⭑" data-k="星 star 装饰 装饰符号"><span>๋࣭ ⭑</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⊹₊⟡⋆" data-k="闪 星 star 装饰 装饰符号"><span>⊹₊⟡⋆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⟡" data-k="钻石 星 装饰 装饰符号"><span>⟡</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="୨♡୧" data-k="爱心 对称 love 装饰 装饰符号"><span>୨♡୧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
       </div>
     </section>
 
-    <section id="cat-29" data-c="边框分隔">
+    <section id="cat-30" data-c="边框分隔">
       <div class="sechead">
         <h2>边框分隔</h2>
         <div class="rule"></div>
-        <span class="count">27 个</span>
+        <span class="count">33 个</span>
       </div>
       <div class="grid parts">
         <div class="tile" role="button" tabindex="0" data-t="ೀ⋆｡˚" data-k="边框 装饰 分隔 边框分隔"><span>ೀ⋆｡˚</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
@@ -1351,6 +1561,12 @@
         <div class="tile" role="button" tabindex="0" data-t="◜◝ ◜◝ ◜◝" data-k="波浪 分隔 边框分隔"><span>◜◝ ◜◝ ◜◝</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="·͙*̩̩͙˚̩̥̩̥*̩̩̥͙" data-k="闪 分隔 边框分隔"><span>·͙*̩̩͙˚̩̥̩̥*̩̩̥͙</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
         <div class="tile" role="button" tabindex="0" data-t="꒰ঌ ໒꒱" data-k="边框 可爱 分隔 边框分隔"><span>꒰ঌ ໒꒱</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="✩₊˚.⋆☾⋆⁺₊✧" data-k="月亮 星 边框 分隔 边框分隔"><span>✩₊˚.⋆☾⋆⁺₊✧</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆" data-k="爱心 边框 love 分隔 边框分隔"><span>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="˚₊‧꒰ა ♡ ໒꒱ ‧₊˚" data-k="爱心 边框 love 分隔 边框分隔"><span>˚₊‧꒰ა ♡ ໒꒱ ‧₊˚</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⋆｡‧˚ʚ♡ɞ˚‧｡⋆" data-k="爱心 蝴蝶结 边框 love 分隔 边框分隔"><span>⋆｡‧˚ʚ♡ɞ˚‧｡⋆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="⋆⭒˚｡⋆" data-k="星 分隔 边框分隔"><span>⋆⭒˚｡⋆</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
+        <div class="tile" role="button" tabindex="0" data-t="༝༚༝༚" data-k="点点 分隔 边框分隔"><span>༝༚༝༚</span><button class="fav" type="button" aria-label="收藏" aria-pressed="false">♡</button></div>
       </div>
     </section>
     <p class="empty hidden" id="empty"></p>
@@ -1358,11 +1574,33 @@
 
   <footer>
     <p>有些符号在别人的手机上可能显示成方框 <span class="mono">□</span>，那是对方字体不支持，重要场合挑常见一点的更保险。</p>
-    <p>这些本质上都是拼装件——把 <span class="mono">( ˃ ᴗ ˂ )</span> 里的嘴换成 <span class="mono">ω</span> 或 <span class="mono">‿</span>，眉眼方向对调，就能捏出新表情。零件都在最后三栏。</p>
+    <p>这些本质上都是拼装件——把 <span class="mono">( ˃ ᴗ ˂ )</span> 里的嘴换成 <span class="mono">ω</span> 或 <span class="mono">‿</span>，眉眼方向对调，就能捏出新表情。零件都在最后三栏，右下角的「✚ 拼装」可以边点边拼。</p>
   </footer>
 </div>
 
-<a class="fab" href="#menu">☰ 目录</a>
+<div class="composer" id="composer">
+  <input id="cin" type="text" placeholder="点任意格子加进来，拼一个自己的 ᖛ ̫ ᖛ" />
+  <button class="cbtn main" id="ccopy">复制</button>
+  <button class="cbtn" id="cclear">清空</button>
+  <button class="cbtn" id="cclose" aria-label="关闭拼装台">✕</button>
+</div>
+
+<div class="fabs">
+  <button class="fab fab-alt needs-js" id="buildBtn" aria-pressed="false">✚ 拼装</button>
+  <a class="fab" href="#menu">☰ 目录</a>
+</div>
+
+<div class="reveal" id="reveal">
+  <div class="reveal-card">
+    <div class="reveal-cat" id="rcat"></div>
+    <div class="reveal-face" id="rface"></div>
+    <div class="reveal-note" id="rnote"></div>
+    <div class="reveal-btns">
+      <button class="cbtn main" id="ragain">再来一个 ✧</button>
+      <button class="cbtn" id="rclose">关闭</button>
+    </div>
+  </div>
+</div>
 
 <div class="menu" id="menu">
   <div class="menu-head">
@@ -1370,36 +1608,37 @@
     <a class="menu-close" href="#close">关闭</a>
   </div>
   <nav class="menu-grid" aria-label="全部分类">
-    <a href="#cat-0">开心<span class="n">51</span></a>
-    <a href="#cat-1">害羞<span class="n">24</span></a>
-    <a href="#cat-2">爱心撒娇<span class="n">38</span></a>
-    <a href="#cat-3">卖萌求求<span class="n">26</span></a>
-    <a href="#cat-4">难过哭泣<span class="n">28</span></a>
-    <a href="#cat-5">生气<span class="n">26</span></a>
-    <a href="#cat-6">疑惑<span class="n">12</span></a>
-    <a href="#cat-7">惊讶<span class="n">19</span></a>
-    <a href="#cat-8">无语冷漠<span class="n">25</span></a>
-    <a href="#cat-9">困了睡了<span class="n">18</span></a>
-    <a href="#cat-10">小动物<span class="n">49</span></a>
-    <a href="#cat-11">打招呼<span class="n">22</span></a>
-    <a href="#cat-12">庆祝跳舞<span class="n">13</span></a>
-    <a href="#cat-13">动作手势<span class="n">17</span></a>
-    <a href="#cat-14">期待兴奋<span class="n">12</span></a>
-    <a href="#cat-15">吃东西<span class="n">16</span></a>
-    <a href="#cat-16">累了打工<span class="n">16</span></a>
-    <a href="#cat-17">加油鼓励<span class="n">13</span></a>
-    <a href="#cat-18">谢谢道歉<span class="n">10</span></a>
-    <a href="#cat-19">尴尬心虚<span class="n">9</span></a>
-    <a href="#cat-20">得意骄傲<span class="n">12</span></a>
-    <a href="#cat-21">偷看躲藏<span class="n">9</span></a>
-    <a href="#cat-22">魔法撒花<span class="n">10</span></a>
-    <a href="#cat-23">音乐<span class="n">9</span></a>
-    <a href="#cat-24">沙雕恶搞<span class="n">17</span></a>
-    <a href="#cat-25">韩系颜文字<span class="n">12</span></a>
-    <a href="#cat-26">抱抱安慰<span class="n">9</span></a>
-    <a href="#cat-27">脸的零件<span class="n">98</span></a>
-    <a href="#cat-28">装饰符号<span class="n">94</span></a>
-    <a href="#cat-29">边框分隔<span class="n">27</span></a>
+    <a href="#cat-0">软萌风<span class="n">53</span></a>
+    <a href="#cat-1">开心<span class="n">51</span></a>
+    <a href="#cat-2">害羞<span class="n">24</span></a>
+    <a href="#cat-3">爱心撒娇<span class="n">38</span></a>
+    <a href="#cat-4">卖萌求求<span class="n">25</span></a>
+    <a href="#cat-5">难过哭泣<span class="n">28</span></a>
+    <a href="#cat-6">生气<span class="n">26</span></a>
+    <a href="#cat-7">疑惑<span class="n">12</span></a>
+    <a href="#cat-8">惊讶<span class="n">19</span></a>
+    <a href="#cat-9">无语冷漠<span class="n">26</span></a>
+    <a href="#cat-10">困了睡了<span class="n">18</span></a>
+    <a href="#cat-11">小动物<span class="n">49</span></a>
+    <a href="#cat-12">打招呼<span class="n">22</span></a>
+    <a href="#cat-13">庆祝跳舞<span class="n">13</span></a>
+    <a href="#cat-14">动作手势<span class="n">17</span></a>
+    <a href="#cat-15">期待兴奋<span class="n">12</span></a>
+    <a href="#cat-16">吃东西<span class="n">16</span></a>
+    <a href="#cat-17">累了打工<span class="n">16</span></a>
+    <a href="#cat-18">加油鼓励<span class="n">13</span></a>
+    <a href="#cat-19">谢谢道歉<span class="n">10</span></a>
+    <a href="#cat-20">尴尬心虚<span class="n">9</span></a>
+    <a href="#cat-21">得意骄傲<span class="n">12</span></a>
+    <a href="#cat-22">偷看躲藏<span class="n">9</span></a>
+    <a href="#cat-23">魔法撒花<span class="n">10</span></a>
+    <a href="#cat-24">音乐<span class="n">9</span></a>
+    <a href="#cat-25">沙雕恶搞<span class="n">17</span></a>
+    <a href="#cat-26">韩系颜文字<span class="n">12</span></a>
+    <a href="#cat-27">抱抱安慰<span class="n">9</span></a>
+    <a href="#cat-28">脸的零件<span class="n">114</span></a>
+    <a href="#cat-29">装饰符号<span class="n">102</span></a>
+    <a href="#cat-30">边框分隔<span class="n">33</span></a>
   </nav>
 </div>
 
@@ -1541,7 +1780,7 @@
         return;
       }
       var hit = e.target.closest(".tile");
-      if (hit) copy(hit);
+      if (hit) act(hit);
     });
 
     out.addEventListener("keydown", function (e) {
@@ -1549,23 +1788,53 @@
       var hit = e.target.closest(".tile");
       if (!hit || e.target.closest(".fav")) return;
       e.preventDefault();
-      copy(hit);
+      act(hit);
     });
 
+    function copyText(text, ok) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(ok, function () { fallback(text, ok); });
+      } else {
+        fallback(text, ok);
+      }
+    }
     function copy(tile) {
       var text = tile.dataset.t;
-      var done = function () {
+      copyText(text, function () {
         uses[text] = (uses[text] || 0) + 1;
         save("kao.uses", uses);
         toast("已复制  " + text);
+        burst(tile);
         tile.classList.add("copied");
         setTimeout(function () { tile.classList.remove("copied"); }, 550);
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done, function () { fallback(text, done); });
-      } else {
-        fallback(text, done);
+      });
+    }
+    /* 拼装模式下点格子是加进拼装台，不是复制 */
+    function act(tile) {
+      if (document.body.classList.contains("composing")) {
+        cin.value += tile.dataset.t;
+        burst(tile);
+        tile.classList.add("copied");
+        setTimeout(function () { tile.classList.remove("copied"); }, 300);
+        return;
       }
+      copy(tile);
+    }
+    function burst(tile) {
+      var wrap = document.createElement("span");
+      wrap.className = "burst";
+      var marks = ["♡", "✧", "⋆"];
+      for (var i = 0; i < 6; i++) {
+        var s = document.createElement("span");
+        s.textContent = marks[i % 3];
+        var a = (i * 60 + Math.random() * 40) * Math.PI / 180;
+        var d = 26 + Math.random() * 16;
+        s.style.setProperty("--dx", Math.cos(a) * d + "px");
+        s.style.setProperty("--dy", Math.sin(a) * d + "px");
+        wrap.appendChild(s);
+      }
+      tile.appendChild(wrap);
+      setTimeout(function () { wrap.remove(); }, 700);
     }
     function fallback(text, done) {
       var ta = document.createElement("textarea");
@@ -1614,6 +1883,61 @@
       syncThemeBtn();
     };
     syncThemeBtn();
+
+    /* ---------- 拼装台 ---------- */
+    var cin = document.getElementById("cin");
+    var composer = document.getElementById("composer");
+    var buildBtn = document.getElementById("buildBtn");
+    buildBtn.onclick = function () {
+      var on = !document.body.classList.contains("composing");
+      document.body.classList.toggle("composing", on);
+      composer.classList.toggle("on", on);
+      buildBtn.setAttribute("aria-pressed", on);
+      if (on) cin.focus();
+    };
+    document.getElementById("cclose").onclick = function () { buildBtn.onclick(); };
+    document.getElementById("cclear").onclick = function () {
+      cin.value = ""; cin.focus();
+    };
+    document.getElementById("ccopy").onclick = function () {
+      if (!cin.value) { toast("先点几个格子拼一个吧"); return; }
+      copyText(cin.value, function () { toast("已复制  " + cin.value); });
+    };
+
+    /* ---------- 随机抽一个 ---------- */
+    var reveal = document.getElementById("reveal");
+    var rface = document.getElementById("rface");
+    var rcat = document.getElementById("rcat");
+    var rnote = document.getElementById("rnote");
+    /* 只抽表情，零件和装饰太素了 */
+    var faceTiles = tiles.filter(function (t) {
+      var c = t.closest("section").dataset.c;
+      return c !== "脸的零件" && c !== "装饰符号" && c !== "边框分隔";
+    });
+    function drawLucky() {
+      var tile = faceTiles[Math.floor(Math.random() * faceTiles.length)];
+      var text = tile.dataset.t;
+      rface.textContent = text;
+      rcat.textContent = tile.closest("section").dataset.c;
+      rnote.textContent = "";
+      copyText(text, function () {
+        uses[text] = (uses[text] || 0) + 1;
+        save("kao.uses", uses);
+        rnote.textContent = "已自动复制，去粘贴吧 ✧";
+      });
+      reveal.classList.add("on");
+    }
+    document.getElementById("lucky").onclick = drawLucky;
+    document.getElementById("ragain").onclick = drawLucky;
+    document.getElementById("rclose").onclick = function () {
+      reveal.classList.remove("on");
+    };
+    reveal.addEventListener("click", function (e) {
+      if (e.target === reveal) reveal.classList.remove("on");
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") reveal.classList.remove("on");
+    });
     }
   })();
 </script>
