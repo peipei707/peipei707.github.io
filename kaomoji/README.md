@@ -1,6 +1,6 @@
 # 颜文字小铺
 
-741 个可爱颜文字和符号零件，分 30 类，点一下就复制。线上地址：<https://peipei707.github.io/kaomoji/>
+863 个可爱颜文字和符号零件，分 32 类，点一下就复制。线上地址：<https://peipei707.github.io/kaomoji/>
 
 `index.html` 是生成出来的，不要直接手改。改内容请动 `data.txt` 或 `template.html`，然后：
 
