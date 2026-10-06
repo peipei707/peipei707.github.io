@@ -331,11 +331,12 @@
     if (k.dataset.i != null) return items[+k.dataset.i].t;
     return k.dataset.t || k.textContent;
   }
-  function copyFrom(text, k, silent) {
+  /* opt.norec：实验室里做出来的句子、电码不记进「最近用过」；opt.face：提示条里显示的字 */
+  function copyFrom(text, k, silent, opt) {
     copyText(text);
-    recordUse(text);
+    if (!(opt && opt.norec)) recordUse(text);
     if (k) stampAt(k);
-    if (!silent) toast("已复制", text);
+    if (!silent) toast("已复制", opt && opt.face ? opt.face : text);
     var it = byText.get(text);
     setMood(it ? moodForTags(it.tags) || "happy" : "happy", 1300);
     haptic(8);
@@ -385,7 +386,11 @@
   });
   document.addEventListener("click", function (e) {
     var cp = e.target.closest("[data-copy]");
-    if (cp) { e.preventDefault(); copyFrom(cp.getAttribute("data-copy"), cp); return; }
+    if (cp) {
+      e.preventDefault();
+      copyFrom(cp.getAttribute("data-copy"), cp, false, { norec: cp.hasAttribute("data-norec"), face: cp.getAttribute("data-face") });
+      return;
+    }
     var k = e.target.closest(".k");
     if (!k) return;
     if (suppress) { suppress = false; e.preventDefault(); return; }
