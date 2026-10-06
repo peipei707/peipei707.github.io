@@ -1453,7 +1453,7 @@
 
   /* ================= 扭蛋机 ================= */
   var RARE_CATS = ["long", "art", "duo", "magic", "meme", "flip"];
-  var SR_CATS = ["soft", "egypt", "jp", "kr", "cool", "smirk"];
+  var SR_CATS = ["soft", "detail", "egypt", "jp", "kr", "cool", "smirk"];
   function poolOf(rar) {
     var byId = function (ids) { return ids.map(function (id) { return K.catById[id] ? K.catById[id].i : -1; }); };
     var rareC = byId(RARE_CATS), srC = byId(SR_CATS);
